@@ -1,0 +1,415 @@
+$color1: rgba(51, 86, 155, 1);
+$color2: #0077c0;
+$color3: rgba(64, 63, 76, 1);
+$color4: #e3e9f2;
+$color5: rgba(80, 87, 104, 1);
+$color6: rgba(66, 74, 94, 1);
+$color7: #2b86bf; //maincolor
+$color8: #07617f; //selectedcolor
+
+body{	
+	padding: 0;
+	margin: 0;
+	background-color: $color4;
+	color: $color7;
+	font-family: "Mido";
+	text-align: center;
+	background-repeat: no-repeat;
+    background-attachment: fixed;
+    a{
+		cursor: pointer;
+	}
+	div#main{
+		height: 500px;
+		margin-right: auto;
+		margin-left: auto;
+		width: 90%;
+		//background-color: #398bbf;
+		border-radius: 30px;
+		div#core{
+			display: flex;
+			//height: 400px;
+			//display: table-row;
+			div#settWrapper{
+				height: 500px;
+				border-right: 5px solid $color6;
+				width: 30%;
+				color: $color4;
+				background-color: $color3;
+				overflow: hidden;
+				text-align: left;
+				display: none;
+				nav#centerControls{
+					h4{
+						display: inline;
+						margin-right: 5px;
+						button{
+							background-color: transparent;
+							color: $color4;
+							border: none;
+						}
+					}
+					height: 35px;
+					background-color: $color3;
+					display: inline-block;
+					padding: 0px 20px;
+				}
+				div#fsettings{
+					//text-align: center;
+					//padding: 4px 0px;
+					//display: none;
+					div.row{
+						display: flex;
+						padding: 6px 0px;
+						margin-left: auto;
+						margin-right: auto;
+						width: 96%;
+						label{
+							display: block;
+							margin-bottom: 20px;
+						}
+						span.thickness{
+							cursor: pointer;
+							margin-left: auto;
+							margin-bottom: 4px;
+							background-color: $color4;
+							display: inline-block;
+							vertical-align: middle;
+							border-radius: 50%;
+							border-color: black;
+						}
+						span.scontainer{
+							margin-right: 6px;
+							display: inline-block;
+							width: 28px;
+							height: 28px;
+							//border: 2px solid $color7;
+							border-radius: 50%;
+						}
+						span.scontainer.selected{
+							border: 2px solid $color4;
+							border-radius: 50%;
+						}
+						span#thn{
+							border: 12px solid $color7;
+							width: 4px;
+							height: 4px;
+						}
+						span#md{
+							border: 11px solid $color7;
+							width: 6px;
+							height: 6px;
+						}
+						span#thk{
+							border: 9px solid $color7;
+							width: 10px;
+							height: 10px;
+						}
+						div.column{
+							display: inline-block;
+							margin-left: auto;
+							margin-right: auto;
+							//padding-top: 12px;
+							//padding-bottom: 8px;
+							//width: 50%;
+							padding: 8px 8px;
+							//text-align: center;
+							background-color: $color6;
+							border-radius: 3px;
+							width: 42%;
+							input{
+								border-radius: 3px;
+								width: 50px;
+								background-color: $color7;
+								border: none;
+								//border-bottom: 2px solid $color4;
+								color: $color4;
+								text-align: center;
+								padding: 6px;
+								padding-right: 0;
+							}
+							input#divide{
+								//border-right: 2px solid $color4;
+								border-radius: 3px 0px 0px 3px;
+								margin-right: -2px;
+							}
+							button{
+								cursor: pointer;
+								border: none;
+								//border-bottom: 2px solid $color4;
+								padding: 6px;
+								padding-right: 8px;
+								padding-left: 8px;
+								margin: 0px;
+								background-color: $color7;
+								color: $color4;
+								//border: 2px solid $color7;					
+							}
+							button.selected{
+								background-color: $color8;
+							}
+							button#resetb{
+								border-radius: 3px 0px 0px 3px;
+							}
+							button#saveb{
+								border-radius: 0px 3px 3px 0px;
+							}
+							div.container{
+								display: inline-block;
+								margin: auto;
+								width: 98%;
+								text-align: left;
+								button{
+									//margin: auto;
+								}
+								button:not(:last-child){
+									margin-right: 0px;
+									margin-bottom: 4px;	
+								}
+							}
+						}
+					}
+					div.row:nth-child(3){
+						div.column{
+							width: 92%;
+						}
+					}
+				}
+			}
+			div#paramWrapper{
+				width: 20%;
+				height: 500px;
+				//background-color: yellow;
+				nav#rightControls{
+					//background-color: purple;
+					vertical-align: center;	
+					label{
+						//background-color: red;
+						display: inline-block;
+					}
+					height: 35px;
+					//background-color: $color3;
+				}
+				div#parameters{	
+					height: 455px;
+					padding: 5px;
+					//background-color: $color3;
+					overflow-y: hidden;
+					button{
+						//background-color: $color7;
+						cursor: pointer;
+						margin: 3px;
+						border: 2px solid $color7;
+						border-radius: 7px;
+						padding: 6px 8px;
+						color: $color7;
+					}
+					div{
+						//background-color: $color3;
+						//border-bottom: 5px solid $color7;
+						color: $color4;
+						height: 360px;
+						padding-right: 8px;
+						padding-left: 8px;
+						//padding-top: 8px;
+						//padding-bottom: 5px;
+						overflow: hidden;
+						white-space: nowrap;
+						//padding-bottom: 17px; /* Increa:se/decrease this value for cross-browser compatibility */
+			    		//box-sizing: content-box; /* So the width will be 100% + 17px */
+			    		margin-top: 15px;
+						span.input{
+							display: flex;
+							text-align: center;
+							margin: 0 auto 10px auto;
+							height: 30px;
+							width: 92.5%;
+							padding: 5px 2.5%;
+							border-radius: 7px;
+							color: $color4;
+							background-color: $color7;
+							span{
+								display: inline-block;
+								margin: auto;
+								label{
+									padding: 3px;
+									padding-right: 8px;
+									padding-left: 8px;
+								}
+								input{
+									width: 0px;
+									background-color: transparent;
+									border: none;
+									padding: 3.5px;
+									padding-right: 1.5px;
+									padding-left: 1.5px;
+									color: $color4;
+									text-align: center;
+									display: none;
+								}
+								input:not(.jscolor){
+									//display: none;
+								}
+								input.jscolor{
+									visibility: visible;
+									width: 22px;
+									border-radius: 75%;
+									border: 2px solid $color4;
+									cursor: pointer;
+								}
+								label.y{
+									border-left: none;
+								}
+								label.value{
+									display: none;
+								}
+								/*label:not(.fx){
+									border-left: 2px solid $color4; 
+								}*/
+								label.selec:not(.fx){
+									border-left: 0; 
+								}
+								label.xt, label.yt{
+									border-left: 0;
+								}
+								label.yt{
+									display: none;
+								}
+								button{
+									background-color: transparent;
+									border: none;
+									cursor: pointer;
+									color: $color4;
+									padding: 3px;
+									padding-right: 5px;
+									margin: 2px;
+								}
+								button{
+									outline: none;
+								}
+								button.delete{
+									margin-left: 3px;
+									padding: 3px;
+									padding-right: 4px;
+									margin-right: 0px;
+									//border-right: 4px solid $color4;
+									padding-top: 5px;
+								}
+								button.dropdown{
+									//border-right: 4px solid $color4;
+								}
+								button.edit{
+									//border-right: 4px solid $color4;
+								}
+								button.save{
+									//border-right: 4px solid $color4;
+								}
+								button.previous{
+
+								}
+								button.next{
+
+								}
+							}
+						}
+						//span:hover{
+						//	input{
+						//		visibility: visible;
+						//		width: 20px;
+						//	}
+						//}
+						span.edit{
+							
+						}	
+						input.selected.f, input.selected.x, input.selected.y, input.selected.value{
+							display: inline-block;
+							width: 70px;
+							//border-bottom: 2px solid $color4;
+						}
+						input.selected.jscolor{
+							width: 35px;
+						}
+						input#function{
+							width: 200px;
+						}
+					}
+				}
+			}
+			div#canvasWrapper{
+				//background-color: red;
+				//width: 1200px;
+				//height: 450px;
+				width: 80%;
+				position: relative;
+				//margin-top: 10px;
+				//margin-right: auto;
+				//margin-left: auto;
+				height: 500px;
+				nav#leftControls{
+					span{
+						width: 30%;
+						display: inline-block;
+						h4{
+							display: inline-block;
+						}
+					}
+					nav{
+						display: inline-block;
+						color: $color4;
+						padding: 6px 12px;
+						background-color: $color7;
+						border-radius: 8px;
+						button{
+							cursor: pointer;
+							background-color: transparent;
+							color: $color4;
+							border: none;
+						}
+					}
+				}
+				div#canvas{
+					height: 465px;
+					//background-color: $color4;
+					canvas#graph{ 
+						position: absolute;
+						height: 480px;
+						display: block;
+						margin-right: auto;
+						margin-left: auto;
+						width: 100%;
+						z-index: 1;
+					}	
+					canvas#toplayer{
+						position: absolute;
+						height: 480px;
+						display: block;
+						margin-right: auto;
+						margin-left: auto;
+						width: 100%;
+						z-index: 2;
+					}
+				}
+			}
+		}
+	}
+	footer{
+		display: inline-block;
+		width: 100%;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 10px;
+		padding-top: 20px;
+		padding-bottom: 20px;
+		padding-right: 5%px;
+		padding-left: 5%px;
+		color: $color4;
+		a{
+			color: $color4;
+			text-decoration: none;
+		}
+	}
+}
+@font-face {
+  font-family: 'Mido';
+  src:	url('fonts/Mido.woff') format('woff');
+}

@@ -1,0 +1,393 @@
+/* line 10, ../../sass/App.scss */
+body {
+  padding: 0;
+  margin: 0;
+  background-color: #e3e9f2;
+  color: #2b86bf;
+  font-family: "Mido";
+  text-align: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+/* line 19, ../../sass/App.scss */
+body a {
+  cursor: pointer;
+}
+/* line 22, ../../sass/App.scss */
+body div#main {
+  height: 500px;
+  margin-right: auto;
+  margin-left: auto;
+  width: 90%;
+  border-radius: 30px;
+}
+/* line 29, ../../sass/App.scss */
+body div#main div#core {
+  display: flex;
+}
+/* line 33, ../../sass/App.scss */
+body div#main div#core div#settWrapper {
+  height: 500px;
+  border-right: 5px solid #424a5e;
+  width: 30%;
+  color: #e3e9f2;
+  background-color: #403f4c;
+  overflow: hidden;
+  text-align: left;
+  display: none;
+}
+/* line 42, ../../sass/App.scss */
+body div#main div#core div#settWrapper nav#centerControls {
+  height: 35px;
+  background-color: #403f4c;
+  display: inline-block;
+  padding: 0px 20px;
+}
+/* line 43, ../../sass/App.scss */
+body div#main div#core div#settWrapper nav#centerControls h4 {
+  display: inline;
+  margin-right: 5px;
+}
+/* line 46, ../../sass/App.scss */
+body div#main div#core div#settWrapper nav#centerControls h4 button {
+  background-color: transparent;
+  color: #e3e9f2;
+  border: none;
+}
+/* line 61, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row {
+  display: flex;
+  padding: 6px 0px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 96%;
+}
+/* line 67, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row label {
+  display: block;
+  margin-bottom: 20px;
+}
+/* line 71, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row span.thickness {
+  cursor: pointer;
+  margin-left: auto;
+  margin-bottom: 4px;
+  background-color: #e3e9f2;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 50%;
+  border-color: black;
+}
+/* line 81, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row span.scontainer {
+  margin-right: 6px;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+/* line 89, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row span.scontainer.selected {
+  border: 2px solid #e3e9f2;
+  border-radius: 50%;
+}
+/* line 93, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row span#thn {
+  border: 12px solid #2b86bf;
+  width: 4px;
+  height: 4px;
+}
+/* line 98, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row span#md {
+  border: 11px solid #2b86bf;
+  width: 6px;
+  height: 6px;
+}
+/* line 103, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row span#thk {
+  border: 9px solid #2b86bf;
+  width: 10px;
+  height: 10px;
+}
+/* line 108, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px 8px;
+  background-color: #424a5e;
+  border-radius: 3px;
+  width: 42%;
+}
+/* line 120, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column input {
+  border-radius: 3px;
+  width: 50px;
+  background-color: #2b86bf;
+  border: none;
+  color: #e3e9f2;
+  text-align: center;
+  padding: 6px;
+  padding-right: 0;
+}
+/* line 131, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column input#divide {
+  border-radius: 3px 0px 0px 3px;
+  margin-right: -2px;
+}
+/* line 136, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column button {
+  cursor: pointer;
+  border: none;
+  padding: 6px;
+  padding-right: 8px;
+  padding-left: 8px;
+  margin: 0px;
+  background-color: #2b86bf;
+  color: #e3e9f2;
+}
+/* line 148, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column button.selected {
+  background-color: #07617f;
+}
+/* line 151, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column button#resetb {
+  border-radius: 3px 0px 0px 3px;
+}
+/* line 154, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column button#saveb {
+  border-radius: 0px 3px 3px 0px;
+}
+/* line 157, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column div.container {
+  display: inline-block;
+  margin: auto;
+  width: 98%;
+  text-align: left;
+}
+/* line 165, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.column div.container button:not(:last-child) {
+  margin-right: 0px;
+  margin-bottom: 4px;
+}
+/* line 173, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row:nth-child(3) div.column {
+  width: 92%;
+}
+/* line 179, ../../sass/App.scss */
+body div#main div#core div#paramWrapper {
+  width: 20%;
+  height: 500px;
+}
+/* line 183, ../../sass/App.scss */
+body div#main div#core div#paramWrapper nav#rightControls {
+  vertical-align: center;
+  height: 35px;
+}
+/* line 186, ../../sass/App.scss */
+body div#main div#core div#paramWrapper nav#rightControls label {
+  display: inline-block;
+}
+/* line 193, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters {
+  height: 455px;
+  padding: 5px;
+  overflow-y: hidden;
+}
+/* line 198, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters button {
+  cursor: pointer;
+  margin: 3px;
+  border: 2px solid #2b86bf;
+  border-radius: 7px;
+  padding: 6px 8px;
+  color: #2b86bf;
+}
+/* line 207, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div {
+  color: #e3e9f2;
+  height: 360px;
+  padding-right: 8px;
+  padding-left: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-top: 15px;
+}
+/* line 221, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input {
+  display: flex;
+  text-align: center;
+  margin: 0 auto 10px auto;
+  height: 30px;
+  width: 92.5%;
+  padding: 5px 2.5%;
+  border-radius: 7px;
+  color: #e3e9f2;
+  background-color: #2b86bf;
+}
+/* line 231, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span {
+  display: inline-block;
+  margin: auto;
+  /*label:not(.fx){
+  	border-left: 2px solid $color4; 
+  }*/
+}
+/* line 234, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span label {
+  padding: 3px;
+  padding-right: 8px;
+  padding-left: 8px;
+}
+/* line 239, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span input {
+  width: 0px;
+  background-color: transparent;
+  border: none;
+  padding: 3.5px;
+  padding-right: 1.5px;
+  padding-left: 1.5px;
+  color: #e3e9f2;
+  text-align: center;
+  display: none;
+}
+/* line 253, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span input.jscolor {
+  visibility: visible;
+  width: 22px;
+  border-radius: 75%;
+  border: 2px solid #e3e9f2;
+  cursor: pointer;
+}
+/* line 260, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span label.y {
+  border-left: none;
+}
+/* line 263, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span label.value {
+  display: none;
+}
+/* line 269, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span label.selec:not(.fx) {
+  border-left: 0;
+}
+/* line 272, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span label.xt, body div#main div#core div#paramWrapper div#parameters div span.input span label.yt {
+  border-left: 0;
+}
+/* line 275, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span label.yt {
+  display: none;
+}
+/* line 278, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: #e3e9f2;
+  padding: 3px;
+  padding-right: 5px;
+  margin: 2px;
+}
+/* line 287, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span button {
+  outline: none;
+}
+/* line 290, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div span.input span button.delete {
+  margin-left: 3px;
+  padding: 3px;
+  padding-right: 4px;
+  margin-right: 0px;
+  padding-top: 5px;
+}
+/* line 324, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div input.selected.f, body div#main div#core div#paramWrapper div#parameters div input.selected.x, body div#main div#core div#paramWrapper div#parameters div input.selected.y, body div#main div#core div#paramWrapper div#parameters div input.selected.value {
+  display: inline-block;
+  width: 70px;
+}
+/* line 329, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div input.selected.jscolor {
+  width: 35px;
+}
+/* line 332, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div input#function {
+  width: 200px;
+}
+/* line 338, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper {
+  width: 80%;
+  position: relative;
+  height: 500px;
+}
+/* line 349, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper nav#leftControls span {
+  width: 30%;
+  display: inline-block;
+}
+/* line 352, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper nav#leftControls span h4 {
+  display: inline-block;
+}
+/* line 356, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper nav#leftControls nav {
+  display: inline-block;
+  color: #e3e9f2;
+  padding: 6px 12px;
+  background-color: #2b86bf;
+  border-radius: 8px;
+}
+/* line 362, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper nav#leftControls nav button {
+  cursor: pointer;
+  background-color: transparent;
+  color: #e3e9f2;
+  border: none;
+}
+/* line 370, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper div#canvas {
+  height: 465px;
+}
+/* line 373, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper div#canvas canvas#graph {
+  position: absolute;
+  height: 480px;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+  width: 100%;
+  z-index: 1;
+}
+/* line 382, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper div#canvas canvas#toplayer {
+  position: absolute;
+  height: 480px;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+  width: 100%;
+  z-index: 2;
+}
+/* line 395, ../../sass/App.scss */
+body footer {
+  display: inline-block;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 5% px;
+  padding-left: 5% px;
+  color: #e3e9f2;
+}
+/* line 406, ../../sass/App.scss */
+body footer a {
+  color: #e3e9f2;
+  text-decoration: none;
+}
+
+@font-face {
+  font-family: 'Mido';
+  src: url("fonts/Mido.woff") format("woff");
+}
