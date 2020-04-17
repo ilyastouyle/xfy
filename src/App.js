@@ -1,10 +1,10 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faAngleDown, faSave, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faAngleDown, faSave, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
 import Functions from './Library';
 import './stylesheets/App.css';
 
-let curves = [[], []];
+let curves = [[], []], animations = [];
 
 class Curve2d{
 	constructor(X, Y, color, width) {
@@ -14,12 +14,23 @@ class Curve2d{
 		this.width = width;
 	}
 }
+class Animation{
+	constructor(type, duration, fps, curvesIndexes){
+		this.type = type;
+		this.animcurves = []; //Animation Curves
+		for(var i = 0; i < curvesIndexes.length; i++){
+			this.animcurves.push(curves[curvesIndexes[i]]);
+		}
+		this.duration = duration;
+		this.fps = fps;
+	}
+};
 
 //Wrapper Curve: Template for Functional and Parameterized Curves
 class WrCurve extends React.Component{
 	constructor(props) {
 		super(props);
-	
+
 		this.state = { cEdit: 0, tempF: [ null, null, null, null ] };
 	}
 	componentDidMount(){
@@ -34,7 +45,18 @@ class WrCurve extends React.Component{
 		this.input.value = "";
 	};
 	next = () => {
-		this.setState({ cEdit: (this.state.cEdit + 1) % 5, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)});
+		this.setState({ cEdit: (this.state.cEdit + 1) % 5, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)}, () => {
+			if(this.props.type === 0){
+				//curves[this.props.type][this.props.cindex].X = Functions.subdivide([this.state.tempF]);
+				if(!!this.state.tempF[1] && !!this.state.tempF[2]){
+					curves[this.props.type][this.props.cindex].X = Functions.subdivide(parseFloat(this.state.tempF[1]), parseFloat(this.state.tempF[2]), 100);
+					for(let i = 0; i < curves[this.props.type][this.props.cindex].X.length; i++){
+						let x = (curves[this.props.type][this.props.cindex].X)[i];
+						curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(this.state.tempF[0]));
+					}
+				}
+			}
+		});
 		this.input.value = "";
 	};
 	edit = () => {
@@ -42,7 +64,6 @@ class WrCurve extends React.Component{
 	};	
 	save = () => {
 		this.setState({ cEdit: 0, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)});
-		this.setState({ cEdit: 0 });	
 	};
 	inputHandler = (e) => {
 		if(e.which === 13) this.next();
@@ -142,18 +163,103 @@ class Settings extends React.Component {
 
 class Canvas extends React.Component {
 	constructor(props) {
-	  super(props);
-	
-	  this.state = {};
+		super(props);
+
+		this.state = { 
+			colors: { 
+				axeColor: "#000000",
+				wireColor: "#cdd1d3",
+				dashColor: "#1F3A93"
+			},
+			widths: {
+				axeWdith: [1, 1],
+				wireWidth: [1, 1],
+				dashWidth: {
+					x: [2, 2],
+					y: [2, 2]
+				}
+			},
+			drawnSteps: {
+				nbSteps: {
+					x: [12, 12],
+					y: [36, 36]
+				},
+				offStepSteps: {
+					x: [3, 3],
+					y: [2, 2]
+				},	
+				stepSize: {
+					x: [35, 35],//for positive then negative x
+					y: [35, 35]//for positive then negative y
+				}   	
+			},
+			font: {
+				x: ["11px Arial", "11px Arial"],
+				y: ["11px Arial", "11px Arial"]
+			},
+			steps: {
+				x: [.25, .25],
+				y: [.25, .25]
+			}};
 	}
+	play = () => {
+		let A = this.state;
+		const canvas = this.refs.canvas;
+		const context = canvas.getContext("2d");
+		this.setState((state, props) => {
+			let newState = state;
+			//Temporary xstep, ystep
+			let tstep = Functions.Maximum([Functions.xstep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.x, A.drawnSteps.offStepSteps.x), Functions.ystep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.y, A.drawnSteps.offStepSteps.y)]);
+			console.log("xstep: " + Functions.xstep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.x, A.drawnSteps.offStepSteps.x));
+			console.log("ystep: " + Functions.ystep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.y, A.drawnSteps.offStepSteps.y));
+			newState.steps.x = [tstep, tstep]; 
+			newState.steps.y = [tstep, tstep];
+			return newState;
+		}, () => {
+			console.log("Final step: " + A.steps.x[0]);
+			this.drawFrame();
+			for(let i = 0; i < curves[0].length; i++){
+				Functions.drawCurve(3, curves[0][i].X, curves[0][i].Y, A.steps.x, A.steps.y, [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], canvas.width/2, canvas.height/2, "#000000", context);
+			}
+		});
+	}
+	drawFrame = () => {
+		let A = this.state;
+		const canvas = this.refs.canvas;
+		const context = canvas.getContext("2d");
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		Functions.drawYAxis(canvas.width/2, A.colors.axeColor, canvas.height, A.widths.axeWidth, context);
+		Functions.drawXAxis(canvas.height/2, A.colors.axeColor, canvas.width, A.widths.axeWidth, context);
+		Functions.drawOnX(canvas.width/2, canvas.height/2, A.steps.x[0], A.drawnSteps.nbSteps.x[0], A.drawnSteps.stepSize.x[0], A.colors.wireColor, A.widths.dashWidth.x[0], A.widths.wireWidth[0], A.font.x[0], context);
+		Functions.drawOnY(canvas.width/2, canvas.height/2, A.steps.y[0], A.drawnSteps.nbSteps.y[0], A.drawnSteps.stepSize.y[0], A.colors.wireColor, A.widths.dashWidth.y[0], A.widths.wireWidth[0], A.font.y[0], context);
+		Functions.drawOnMinusX(canvas.width/2, canvas.height/2, A.steps.x[1], A.drawnSteps.nbSteps.x[0], A.drawnSteps.stepSize.x[1], A.colors.wireColor, A.widths.dashWidth.x[1], A.widths.wireWidth[0], A.font.x[1], context);
+		Functions.drawOnMinusY(canvas.width/2, canvas.height/2, A.steps.y[1], A.drawnSteps.nbSteps.y[1], A.drawnSteps.stepSize.y[1], A.colors.wireColor, A.widths.dashWidth.y[1], A.widths.wireWidth[0], A.font.y[1], context);
+	}
+	componentDidMount(){
+		this.setState({canvas: this.refs.canvasW});
+	}
+	componentDidUpdate(){
+		
+		//this.drawFrame();
+		//Functions.drawCurve(2, [-3, -2, -1, 0, 1, 2, 3], [9, 4, 1, 0, 1, 4, 9], [1, 1], [1, 1], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], canvas.width/2, canvas.height/2, "#000000", context);
+	}
+
 	render(){
-		return (<div id="canvasWrapper">
-					<LControls />
-					<div id="canvas">
-						<canvas id="graph" width="400" height="400"></canvas>
-						<canvas id="toplayer" width="400" height="400"></canvas>
+		if(!this.state.canvas){
+			return (<div id="canvasWrapper">
+					<LControls play={this.play}/>
+					<div id="canvas" ref="canvasW"></div>
+				</div>);
+		}
+		else{
+			return (<div id="canvasWrapper">
+					<LControls play={this.play}/>
+					<div id="canvas" ref="canvasW">
+						<canvas ref="canvas" id="graph" width={this.state.canvas.clientWidth} height={this.state.canvas.clientHeight}></canvas>
+						<canvas id="toplayer" width={this.state.canvas.clientWidth} height={this.state.canvas.clientHeight}></canvas>
 					</div>
 				</div>);
+		}
 	}
 }
 
@@ -167,8 +273,15 @@ class LControls extends React.Component {
 		return (<nav id="leftControls">
 					<span>
 						<h4>Animation 1 </h4>
+					</span>
+					<nav>	
+						<button onClick={this.props.play}><FontAwesomeIcon icon={faPlay} /></button>
+						<button><FontAwesomeIcon icon={faPause} /></button>
+						<button><FontAwesomeIcon icon={faStop} /></button>
+					</nav>				
+					<span>
 						<h4>4 seconds </h4>
-					</span>					
+					</span>
 					<nav>
 						<button><FontAwesomeIcon icon={faSearchPlus} /></button>
 						<button><FontAwesomeIcon icon={faSearchMinus} /></button>
@@ -176,6 +289,10 @@ class LControls extends React.Component {
 						<button><FontAwesomeIcon icon={faArrowRight} /></button>
 						<button><FontAwesomeIcon icon={faArrowUp} /></button>
 						<button><FontAwesomeIcon icon={faArrowDown} /></button>
+					</nav>
+					<nav>
+						<button><b>Save</b></button>
+						<button><b>Export</b></button>
 					</nav>
 				</nav>);
 	}
@@ -189,8 +306,42 @@ class RControls extends React.Component {
 	}
 	render(){
 		return(<nav id="rightControls">
-					<h4>Curves</h4>
+					<b>Curves</b>
 				</nav>);
+	}
+}
+
+class ParamWrapper extends React.Component {
+	constructor(props) {
+	  super(props);
+	
+	  this.state = {curves: curves};
+	}
+	newCurve = () => {
+		//var curve = <Curve cindex={curves.length} delete={this.delete} />;
+		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
+		this.setState({curves: curves});
+	};
+	newPCurve = () => {
+		curves[1].push(new Curve2d([], [], "#FFFFFF", 2));
+		this.setState({curves: curves});
+	};
+	delete = (arg) => {
+		curves[arg[0]].splice(arg[1], 1);
+		this.setState({curves: curves});
+	};
+	render(){
+		return (<div id="paramWrapper">
+					<RControls />
+					<div id="parameters">
+						<button id="addc" onClick={this.newCurve}> <FontAwesomeIcon icon={faPlus} /> FCurve </button>
+						<button id="addp" onClick={this.newPCurve}> <FontAwesomeIcon icon={faPlus} /> PCurve </button>
+						<div>
+							{curves[0].map((el, ind) => <WrCurve key={ind} type={0} cindex={ind} delete={this.delete} />)}
+							{curves[1].map((el, ind) => <WrCurve key={ind} type={1} cindex={ind} delete={this.delete} />)}
+						</div><br/>
+					</div>
+				</div>);
 	}
 }
 
@@ -200,35 +351,12 @@ class App extends React.Component {
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
 		this.state = {curves: curves};
 	};
-	newCurve = () => {
-		//var curve = <Curve cindex={curves.length} delete={this.delete} />;
-		curves[0].push(Date.now());
-		this.setState({curves: curves});
-	};
-	newPCurve = () => {
-		curves[1].push(Date.now());
-		this.setState({curves: curves});
-	};
-	delete = (arg) => {
-		curves[arg[0]].splice(arg[1], 1);
-		this.setState({curves: curves});
-	};
 	render(){
 		return (<div id="main">
 					<div id="core">
 						<Canvas/>
 						<Settings/>
-						<div id="paramWrapper">
-							<RControls />
-							<div id="parameters">
-								<button id="addc" onClick={this.newCurve}> <FontAwesomeIcon icon={faPlus} /> <b>FCurve</b> </button>
-								<button id="addp" onClick={this.newPCurve}> <FontAwesomeIcon icon={faPlus} /> <b>PCurve</b> </button>
-								<div>
-									{curves[0].map((el, ind) => <WrCurve key={ind} type={0} cindex={ind} delete={this.delete} />)}
-									{curves[1].map((el, ind) => <WrCurve key={ind} type={1} cindex={ind} delete={this.delete} />)}
-								</div><br/>
-							</div>
-						</div>
+						<ParamWrapper/>
 					</div>
 				</div>);
 	}

@@ -178,32 +178,32 @@ body{
 			}
 			div#paramWrapper{
 				width: 20%;
-				height: 500px;
-				//background-color: yellow;
+				padding: 0% 2%;
+				height: 460px;
 				nav#rightControls{
-					//background-color: purple;
-					vertical-align: center;	
-					label{
-						//background-color: red;
-						display: inline-block;
-					}
-					height: 35px;
-					//background-color: $color3;
+					display: flex;
+					width: 100%;
+					height: 40px;
+					justify-content: center;
+					align-items: center;
 				}
 				div#parameters{	
-					height: 455px;
-					padding: 5px;
-					//background-color: $color3;
+					height: 410px;
+					padding: 8px 5px 5px 5px;
 					overflow-y: hidden;
+					//border-top: 2px solid red;
 					button{
 						//background-color: $color7;
 						cursor: pointer;
 						margin: 3px;
 						border: 2px solid $color7;
-						border-radius: 7px;
-						padding: 6px 8px;
+						border-radius: 10px;
+						padding: 7px 8px;
 						color: $color7;
 					}
+					button::-moz-focus-inner{
+						border: 0;
+					}					
 					div{
 						//background-color: $color3;
 						//border-bottom: 5px solid $color7;
@@ -336,56 +336,73 @@ body{
 				}
 			}
 			div#canvasWrapper{
-				//background-color: red;
 				//width: 1200px;
 				//height: 450px;
-				width: 80%;
+				width: 76%;
+				//padding: 0% 1%;
 				position: relative;
 				//margin-top: 10px;
 				//margin-right: auto;
 				//margin-left: auto;
-				height: 500px;
+				height: 460px;
 				nav#leftControls{
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					height: 40px;
+					//border: 2px solid red;
+					margin-bottom: 15px;
 					span{
-						width: 30%;
+						width: 15%;
 						display: inline-block;
 						h4{
 							display: inline-block;
 						}
 					}
 					nav{
+						margin: 5px;
 						display: inline-block;
-						color: $color4;
+						color: $color7;
 						padding: 6px 12px;
-						background-color: $color7;
 						border-radius: 8px;
+						border: 2px solid $color7;
+						background-color: #dce2ea;
 						button{
+							padding: 0px 5px;
 							cursor: pointer;
 							background-color: transparent;
-							color: $color4;
+							color: $color7;
 							border: none;
+						}
+						button::-moz-focus-inner{
+							border: 0;
 						}
 					}
 				}
 				div#canvas{
-					height: 465px;
+					height: 405px;
+					width: 100%;
+					//border-top: 2px solid red;
 					//background-color: $color4;
+					border: 3px solid $color7;
+					background-color: #dce2ea;
+					border-radius: 20px;
 					canvas#graph{ 
 						position: absolute;
-						height: 480px;
+						height: inherit;
 						display: block;
 						margin-right: auto;
 						margin-left: auto;
-						width: 100%;
+						width: inherit;
 						z-index: 1;
 					}	
 					canvas#toplayer{
 						position: absolute;
-						height: 480px;
+						height: inherit;
 						display: block;
 						margin-right: auto;
 						margin-left: auto;
-						width: 100%;
+						//width: inherit;
 						z-index: 2;
 					}
 				}

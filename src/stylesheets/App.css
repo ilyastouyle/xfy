@@ -177,31 +177,35 @@ body div#main div#core div#settWrapper div#fsettings div.row:nth-child(3) div.co
 /* line 179, ../../sass/App.scss */
 body div#main div#core div#paramWrapper {
   width: 20%;
-  height: 500px;
+  padding: 0% 2%;
+  height: 460px;
 }
 /* line 183, ../../sass/App.scss */
 body div#main div#core div#paramWrapper nav#rightControls {
-  vertical-align: center;
-  height: 35px;
+  display: flex;
+  width: 100%;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
 }
-/* line 186, ../../sass/App.scss */
-body div#main div#core div#paramWrapper nav#rightControls label {
-  display: inline-block;
-}
-/* line 193, ../../sass/App.scss */
+/* line 190, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters {
-  height: 455px;
-  padding: 5px;
+  height: 410px;
+  padding: 8px 5px 5px 5px;
   overflow-y: hidden;
 }
-/* line 198, ../../sass/App.scss */
+/* line 195, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters button {
   cursor: pointer;
   margin: 3px;
   border: 2px solid #2b86bf;
-  border-radius: 7px;
-  padding: 6px 8px;
+  border-radius: 10px;
+  padding: 7px 8px;
   color: #2b86bf;
+}
+/* line 204, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters button::-moz-focus-inner {
+  border: 0;
 }
 /* line 207, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div {
@@ -316,59 +320,77 @@ body div#main div#core div#paramWrapper div#parameters div input#function {
 }
 /* line 338, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper {
-  width: 80%;
+  width: 76%;
   position: relative;
-  height: 500px;
+  height: 460px;
 }
-/* line 349, ../../sass/App.scss */
+/* line 348, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper nav#leftControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  margin-bottom: 15px;
+}
+/* line 355, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls span {
-  width: 30%;
+  width: 15%;
   display: inline-block;
 }
-/* line 352, ../../sass/App.scss */
+/* line 358, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls span h4 {
   display: inline-block;
 }
-/* line 356, ../../sass/App.scss */
-body div#main div#core div#canvasWrapper nav#leftControls nav {
-  display: inline-block;
-  color: #e3e9f2;
-  padding: 6px 12px;
-  background-color: #2b86bf;
-  border-radius: 8px;
-}
 /* line 362, ../../sass/App.scss */
-body div#main div#core div#canvasWrapper nav#leftControls nav button {
-  cursor: pointer;
-  background-color: transparent;
-  color: #e3e9f2;
-  border: none;
+body div#main div#core div#canvasWrapper nav#leftControls nav {
+  margin: 5px;
+  display: inline-block;
+  color: #2b86bf;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 2px solid #2b86bf;
+  background-color: #dce2ea;
 }
 /* line 370, ../../sass/App.scss */
-body div#main div#core div#canvasWrapper div#canvas {
-  height: 465px;
+body div#main div#core div#canvasWrapper nav#leftControls nav button {
+  padding: 0px 5px;
+  cursor: pointer;
+  background-color: transparent;
+  color: #2b86bf;
+  border: none;
 }
-/* line 373, ../../sass/App.scss */
-body div#main div#core div#canvasWrapper div#canvas canvas#graph {
-  position: absolute;
-  height: 480px;
-  display: block;
-  margin-right: auto;
-  margin-left: auto;
-  width: 100%;
-  z-index: 1;
+/* line 377, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper nav#leftControls nav button::-moz-focus-inner {
+  border: 0;
 }
 /* line 382, ../../sass/App.scss */
-body div#main div#core div#canvasWrapper div#canvas canvas#toplayer {
+body div#main div#core div#canvasWrapper div#canvas {
+  height: 405px;
+  width: 100%;
+  border: 3px solid #2b86bf;
+  background-color: #dce2ea;
+  border-radius: 20px;
+}
+/* line 390, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper div#canvas canvas#graph {
   position: absolute;
-  height: 480px;
+  height: inherit;
   display: block;
   margin-right: auto;
   margin-left: auto;
-  width: 100%;
+  width: inherit;
+  z-index: 1;
+}
+/* line 399, ../../sass/App.scss */
+body div#main div#core div#canvasWrapper div#canvas canvas#toplayer {
+  position: absolute;
+  height: inherit;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
   z-index: 2;
 }
-/* line 395, ../../sass/App.scss */
+/* line 412, ../../sass/App.scss */
 body footer {
   display: inline-block;
   width: 100%;
@@ -381,7 +403,7 @@ body footer {
   padding-left: 5% px;
   color: #e3e9f2;
 }
-/* line 406, ../../sass/App.scss */
+/* line 423, ../../sass/App.scss */
 body footer a {
   color: #e3e9f2;
   text-decoration: none;
