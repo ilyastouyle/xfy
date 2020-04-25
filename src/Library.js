@@ -63,11 +63,15 @@ let Functions = {
 			}
 		}
 		if(Math.abs(mn) >= Math.abs(mx)){
-			if(Math.abs(mn) > 1){
-				while(Math.abs(mn) > (nbSteps[1] - nbOffSteps[1])*d){
-					d++;
+			if(Math.abs(mn) >= 1){
+				let a = 0;
+				while(Math.pow(10,-a)*(nbSteps[1] - nbOffSteps[1]) >= Math.abs(mn)){
+					a++;
 				}
-				return d;
+				while(d*Math.pow(10, -a)*(nbSteps[1] - nbOffSteps[1]) < Math.abs(mn)){
+					d++;
+				};
+				return parseFloat((d*Math.pow(10, -a)).toFixed(a));
 			}
 			else{
 				//Get order of first nonzero integer after decimal
@@ -82,11 +86,15 @@ let Functions = {
 			}
 		}
 		else{
-			if(Math.abs(mx) > 1){
-				while(Math.abs(mx) > (nbSteps[0] - nbOffSteps[0])*d){
-					d++;
+			if(Math.abs(mx) >= 1){
+				let a = 0;
+				while(Math.pow(10,-a)*(nbSteps[0] - nbOffSteps[0]) >= 1){
+					a++;
 				}
-				return d;
+				while(d*Math.pow(10, -a)*(nbSteps[0] - nbOffSteps[0]) < 1){
+					d++;
+				};
+				return parseFloat((d*Math.pow(10, -a)).toFixed(a));
 			}
 			else{
 				let a = 0;
@@ -114,19 +122,15 @@ let Functions = {
 			}
 		}
 		if(Math.abs(mn) >= Math.abs(mx)){
-			if(Math.abs(mn) > 1){
-				while(Math.abs(mn) > (nbSteps[1] - nbOffSteps[1])*d){
-					d++;
+			if(Math.abs(mn) >= 1){
+				let a = 0;
+				while(Math.pow(10,-a)*(nbSteps[1] - nbOffSteps[1]) >= 1){
+					a++;
 				}
-				return d;
-			}
-			else if(Math.abs(mn) == 1){
-				console.log("here");
-				let a = parseInt((nbSteps[1] - nbOffSteps[1])/10);
-				while(d*Math.pow(10,-a) < 1){
+				while(d*Math.pow(10, -a)*(nbSteps[1] - nbOffSteps[1]) < 1){
 					d++;
-				}
-				return d*Math.pow(10,-a);
+				};
+				return parseFloat((d*Math.pow(10, -a)).toFixed(a));
 			}
 			else{
 				//Get order of first nonzero integer after decimal
@@ -141,11 +145,15 @@ let Functions = {
 			}	
 		}
 		else{
-			if(Math.abs(mx) > 1){
-				while(Math.abs(mx) > (nbSteps[0] - nbOffSteps[0])*d){
-					d++;
+			if(Math.abs(mx) >= 1){
+				let a = 0;
+				while(Math.pow(10,-a)*(nbSteps[0] - nbOffSteps[0]) >= 1){
+					a++;
 				}
-				return d;
+				while(d*Math.pow(10, -a)*(nbSteps[0] - nbOffSteps[0]) < 1){
+					d++;
+				};
+				return parseFloat((d*Math.pow(10, -a)).toFixed(a));
 			}
 			else{
 				let a = 0;
@@ -158,34 +166,6 @@ let Functions = {
 				return d*Math.pow(10, -a);
 			}	
 		}
-		/*if(Math.abs(mn) >= 2 && Math.abs(mx) >= 2){
-			if(Math.abs(mn) >= Math.abs(mx)){
-				while(Math.abs(mn) > 2*d){
-					d++;
-				}
-				return d/5;
-			}
-			else{
-				while(Math.abs(mx) > 2*d){
-					d++;
-				}
-				return d/5;
-			}
-
-		else{
-			if(Math.abs(mn) >= Math.abs(mx)){
-				while(Math.abs(mn) > 2*Math.pow(10, d)){
-					d--;
-				}
-				return Math.pow(10, d - 1);
-			}
-			else{
-				while(Math.abs(mx) > 2*Math.pow(10, d)){
-					d--;
-				}
-				return Math.pow(10, d - 1);
-			}
-		}*/
 	},
 	drawOnX: function drawOnX(x, y, xstep, m, thestep, color, dashWidth, wireWidth, font, context){
 		for(let i = 1; i < m+1; i++){
