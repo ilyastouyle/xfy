@@ -322,7 +322,7 @@ body div#main div#core div#paramWrapper div#parameters div input#function {
 body div#main div#core div#canvasWrapper {
   width: 76%;
   position: relative;
-  height: 460px;
+  height: 480px;
 }
 /* line 348, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls {
@@ -365,7 +365,7 @@ body div#main div#core div#canvasWrapper nav#leftControls nav button::-moz-focus
 }
 /* line 382, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper div#canvas {
-  height: 405px;
+  height: 420px;
   width: 100%;
   border: 3px solid #2b86bf;
   background-color: #dce2ea;

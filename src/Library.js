@@ -58,7 +58,7 @@ let Functions = {
 			}
 		}
 		for(let i = 1; i < curves.length; i++){
-			if(mx < this.Maximum(curves[i].X)){
+			if(mx < this.Maximum(curves[i].X)){	
 				mx = this.Maximum(curves[i].X)
 			}
 		}
@@ -345,23 +345,23 @@ let Functions = {
 		}
 	},
 	//Takes the width, of the line to draw with, the table of values and their images, x,y steps and the color
-	drawCurve: function drawCurve(w, values, images, xstep, ystep, thestep, x, y, color, context){
+	drawCurve: function drawCurve(w, values, images, steps, thestep, x, y, color, context){
 		context.beginPath();
 		context.strokeStyle = color;
 		context.moveTo(x, y);
 		context.lineWidth = w;
-		if(ystep[0] < Math.exp(12)){
+		if(steps[1][0] < Math.exp(12)){
 			for(let i = 0; i < values.length; i++){
 				if(!isNaN(images[i])){
-					context.moveTo(this.Xcoord(values[i], xstep, thestep[0], x), this.Ycoord(images[i], ystep, thestep[1], y));
-					context.lineTo(this.Xcoord(values[i+1], xstep, thestep[0], x), this.Ycoord(images[i+1], ystep, thestep[1], y));
+					context.moveTo(this.Xcoord(values[i], steps[0], thestep[0], x), this.Ycoord(images[i], steps[1], thestep[1], y));
+					context.lineTo(this.Xcoord(values[i+1], steps[0], thestep[0], x), this.Ycoord(images[i+1], steps[1], thestep[1], y));
 				}
 			}
 		}
 		else{
 			for(let i = 0; i <= values.length; i++){
-				context.moveTo(this.Xcoord(values[i], xstep, thestep[0], x), this.Ycoord(images[i], ystep, thestep[1], y));
-				context.lineTo(this.Xcoord(values[i+1], xstep, thestep[0], x), this.Ycoord(images[i+1], ystep, thestep[1], y));
+				context.moveTo(this.Xcoord(values[i], steps[0], thestep[0], x), this.Ycoord(images[i], steps[1], thestep[1], y));
+				context.lineTo(this.Xcoord(values[i+1], steps[0], thestep[0], x), this.Ycoord(images[i+1], steps[1], thestep[1], y));
 			}
 		}
 		context.stroke();

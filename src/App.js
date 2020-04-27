@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCut, faAngleDown, faSave, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
 import Functions from './Library';
+import Animations from './Animations';
 import './stylesheets/App.css';
 
 let curves = [[], []], animations = [];
@@ -15,14 +16,35 @@ class Curve2d{
 	}
 }
 class Animation{
-	constructor(type, duration, fps, curvesIndexes){
+	/* 
+		type: type of animation (Integer) 
+		duration: duration of animation in seconds (Float)
+		fps: frames per second (Integer)
+		curvInd: the curves involved in the animation ([[0 or 1, index],[...],...])
+	*/
+	constructor(type, duration, fps, curvInd){
 		this.type = type;
-		this.animcurves = []; //Animation Curves
-		for(var i = 0; i < curvesIndexes.length; i++){
-			this.animcurves.push(curves[curvesIndexes[i]]);
+		this.animCurves = [];
+		for(var i = 0; i < curvInd.length; i++){
+			this.animCurves.push(curves[curvInd[i][0]][curvInd[i][1]]);
 		}
 		this.duration = duration;
 		this.fps = fps;
+	}
+	execute(steps, thestep, canvasDim, context, executeBefore = () => {} ){
+		executeBefore();
+		switch(this.type){
+			//no animation
+			case 0:
+				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, "#000000", context);
+				break;
+			//morph curve1 into curve2 
+			case 1:
+				Animations.morph(this.animCurves, this.duration, this.fps, (tab1, tab2) => {
+					Functions.drawCurve(this.animCurves[0].width, tab1, tab2, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, "#000000", context);
+				});
+				break;
+		}
 	}
 };
 
@@ -32,6 +54,7 @@ class WrCurve extends React.Component{
 		super(props);
 
 		this.state = { cEdit: 0, tempF: [ null, null, null, null ] };
+		animations.push(new Animation(0, 1, 1, [[this.props.type, this.props.cindex]]));
 	}
 	componentDidMount(){
 		window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, "parameters"]);
@@ -63,7 +86,9 @@ class WrCurve extends React.Component{
 		this.setState({ cEdit: 1 });
 	};	
 	save = () => {
-		this.setState({ cEdit: 0, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)});
+		this.setState({ cEdit: 0, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)}, () => {
+			animations.push(new Animation(0, 1, 1, [[this.props.type, this.props.cindex]]));
+		});
 	};
 	inputHandler = (e) => {
 		if(e.which === 13) this.next();
@@ -182,11 +207,11 @@ class Canvas extends React.Component {
 			drawnSteps: {
 				nbSteps: {
 					x: [12, 12],
-					y: [36, 36]
+					y: [6, 6]
 				},
 				offStepSteps: {
-					x: [3, 3],
-					y: [2, 2]
+					x: [1, 1],
+					y: [1, 1]
 				},	
 				stepSize: {
 					x: [35, 35],//for positive then negative x
@@ -210,16 +235,13 @@ class Canvas extends React.Component {
 			let newState = state;
 			//Temporary xstep, ystep
 			let tstep = Functions.Maximum([Functions.xstep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.x, A.drawnSteps.offStepSteps.x), Functions.ystep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.y, A.drawnSteps.offStepSteps.y)]);
-			console.log("xstep: " + Functions.xstep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.x, A.drawnSteps.offStepSteps.x));
-			console.log("ystep: " + Functions.ystep([...curves[0], ...curves[1]], A.drawnSteps.nbSteps.y, A.drawnSteps.offStepSteps.y));
 			newState.steps.x = [tstep, tstep]; 
 			newState.steps.y = [tstep, tstep];
 			return newState;
 		}, () => {
-			console.log("Final step: " + A.steps.x[0]);
 			this.drawFrame();
-			for(let i = 0; i < curves[0].length; i++){
-				Functions.drawCurve(3, curves[0][i].X, curves[0][i].Y, A.steps.x, A.steps.y, [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], canvas.width/2, canvas.height/2, "#000000", context);
+			for(let i = 0; i < animations.length; i++){
+				animations[i].execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], context);
 			}
 		});
 	}
