@@ -370,19 +370,11 @@ class ParamWrapper extends React.Component {
 			if(ind == indice[0]){
 				if(!!(el.curvInd[indice[1]])){
 					//el.curvInd.forEach((element) => console.log(element[0]));
-					el.curvInd.forEach((element, index) => {
-						if(index >= indice[1] && element[0] == arg[0]){
-							element[1]--;
-						}
-					});
+					el.curvInd.forEach((element, index) => element[1] -= (index >= indice[1] && element[0] == arg[0]) ? 1 : 0);
 				}
 			}
-			if(ind > indice[0]){
-				el.curvInd.forEach((element, index) => {
-					if(element[0] == arg[0]){
-						element[1]--;
-					}
-				});
+			if(ind > indice[0]){	
+				el.curvInd.forEach((element, index) => element[1] -= (element[0] == arg[0]) ? 1 : 0);
 			}
 		});
 		animations = animations.filter(el => el.curvInd.length > 0);
@@ -420,10 +412,7 @@ class App extends React.Component {
 	constructor(props){
 		super(props);	
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
-		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
-		curves[1].push(new Curve2d([], [], "#FFFFFF", 2));
-		curves[1].push(new Curve2d([], [], "#FFFFFF", 2));
-		animations.push(new Animation(1, 0.5, 10, [[0, 0], [0, 1], [1, 0], [1, 1]]));
+		animations.push(new Animation(1, 0.5, 10, [[0, 0]]));
 		this.state = {curves: curves};
 	};
 	render(){
