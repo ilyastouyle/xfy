@@ -4,8 +4,9 @@ $color3: rgba(64, 63, 76, 1);
 $color4: #e3e9f2;
 $color5: rgba(80, 87, 104, 1);
 $color6: rgba(66, 74, 94, 1);
-$color7: #2b86bf; //maincolor
+$color7: #2B86BF; //maincolor
 $color8: #07617f; //selectedcolor
+$color9: #58AAD2; //bound curves color
 
 body{	
 	padding: 0;
@@ -205,25 +206,24 @@ body{
 						border: 0;
 					}					
 					div{
-						//background-color: $color3;
 						//border-bottom: 5px solid $color7;
 						color: $color4;
 						height: 360px;
-						padding-right: 8px;
-						padding-left: 8px;
+						//padding-right: 8px;
+						//padding-left: 8px;
 						//padding-top: 8px;
 						//padding-bottom: 5px;
 						overflow: hidden;
 						white-space: nowrap;
-						//padding-bottom: 17px; /* Increa:se/decrease this value for cross-browser compatibility */
+						//padding-bottom: 17px; /* Increase/decrease this value for cross-browser compatibility */
 			    		//box-sizing: content-box; /* So the width will be 100% + 17px */
 			    		margin-top: 15px;
 						span.input{
 							display: flex;
 							text-align: center;
-							margin: 0 auto 10px auto;
+							margin: 0px auto 6px auto;
 							height: 30px;
-							width: 92.5%;
+							width: 85%;
 							padding: 5px 2.5%;
 							border-radius: 7px;
 							color: $color4;
@@ -310,6 +310,20 @@ body{
 								button.next{
 
 								}
+							}
+						}
+						span.inputWrapper{
+							display: flex;
+							flex-direction: column;
+							background-color: $color9;
+							padding: 10px 0px;
+							//height: 40px;
+							border-radius: 5px;
+							margin: 6px auto;
+							margin-bottom: 5px;
+							width: 100%;
+							span.input{
+								margin: 4px auto;
 							}
 						}
 						//span:hover{

@@ -13,14 +13,10 @@ let Animations = {
 				}
 				else{
 					for(let i = 0; i < curves[0].X.length; i++){
-						//console.log((curves[1].Y)[i] + (curves[0].Y)[i])/2
-						tab1[i] = k*(curves[1].X[curves[1].X.length - 1 - i] - curves[0].X[i])/nbf + curves[0].X[i];
-						let ai = (curves[0].Y[i] - curves[1].Y[curves[1].Y.length - 1 - i])/(curves[0].X[i] - curves[1].X[curves[1].X.length - 1 - i]);
-						let bi = curves[0].Y[i] - ai*curves[0].X[i];
-						tab2[i] = ai*tab1[i] + bi;
+						tab1[i] = k*(curves[1].X[i] - curves[0].X[i])/nbf + curves[0].X[i];
+						tab2[i] = k*(curves[1].Y[i] - curves[0].Y[i])/nbf + curves[0].Y[i];
 					}
-				}						
-				//console.log(tab2);
+				}				
 				executewithin(tab1, tab2);
 				//(new curves[1]d(tab1, tab2, "#3A539B", 3)).draw();
 				//console.log("Iteration number " + k);
@@ -31,7 +27,7 @@ let Animations = {
 				//tab2 = [];	
 			}
 			k++;
-		}, (time/nbf));
+		}, ((1000)/fps));
 		return maininterval;
 	},
 };

@@ -24,23 +24,25 @@ class Animation{
 	*/
 	constructor(type, duration, fps, curvInd){
 		this.type = type;
+		this.curvInd = curvInd;
 		this.animCurves = [];
-		for(var i = 0; i < curvInd.length; i++){
-			this.animCurves.push(curves[curvInd[i][0]][curvInd[i][1]]);
-		}
 		this.duration = duration;
 		this.fps = fps;
 	}
 	execute(steps, thestep, canvasDim, context, executeBefore = () => {} ){
-		executeBefore();
+		for(var i = 0; i < this.curvInd.length; i++){
+			this.animCurves.push(curves[this.curvInd[i][0]][this.curvInd[i][1]]);
+		}
 		switch(this.type){
 			//no animation
 			case 0:
+				executeBefore();
 				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, "#000000", context);
 				break;
 			//morph curve1 into curve2 
 			case 1:
 				Animations.morph(this.animCurves, this.duration, this.fps, (tab1, tab2) => {
+					executeBefore();
 					Functions.drawCurve(this.animCurves[0].width, tab1, tab2, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, "#000000", context);
 				});
 				break;
@@ -54,7 +56,7 @@ class WrCurve extends React.Component{
 		super(props);
 
 		this.state = { cEdit: 0, tempF: [ null, null, null, null ] };
-		animations.push(new Animation(0, 1, 1, [[this.props.type, this.props.cindex]]));
+		//animations.push(new Animation(0, 1, 1, [[this.props.type, this.props.cindex]]));
 	}
 	componentDidMount(){
 		window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, "parameters"]);
@@ -105,20 +107,20 @@ class WrCurve extends React.Component{
 			labels = ["x_{ " + (this.props.cindex + 1) + " }(t)", "y_{ " + (this.props.cindex + 1) + " }(t)", "a", "b"];
 		} 
 		return (<span className="input">
-					<span>
-						<button className="delete" onClick={() => {this.props.delete([this.props.type, this.props.cindex])}} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faCut}/></button>
-						<button className="dropdown" style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faAngleDown} size="lg"/></button>
-						<button className="save" onClick={this.save} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faSave}/></button>
-						<button className="previous" onClick={this.previous} style={{display: (this.state.cEdit > 1) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleLeft} size="lg"/></button>
-						<label style={{display: (this.state.cEdit < 2) ? "inline" : "none"}}>&#92;({labels[0]}&#92;)</label>
-						<label style={{display: (this.state.cEdit === 2) ? "inline" : "none"}}>&#92;({labels[1]}&#92;)</label>
-						<label style={{display: (this.state.cEdit === 3) ? "inline" : "none"}}>&#92;({labels[2]}&#92;)</label>
-						<label style={{display: (this.state.cEdit === 4) ? "inline" : "none"}}>&#92;({labels[3]}&#92;)</label>
-						<input className={inputClasses[this.state.cEdit]} type="text" ref={(input) => { this.input = input; }} onKeyUp={this.inputHandler} placeholder={placeholders[this.state.cEdit]} onChange={()=>{}}/>
-						<button className="next" onClick={this.next} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleRight} size="lg"/></button>
-						<button className="edit" onClick={this.edit} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faPencilAlt}/></button>
-						<input className="jscolor" value="#3A539B" onChange={()=>{}}/>
-					</span>
+						<span>
+							<button className="delete" onClick={() => {this.props.delete([this.props.type, this.props.cindex])}} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faCut}/></button>
+							<button className="dropdown" style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faAngleDown} size="lg"/></button>
+							<button className="save" onClick={this.save} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faSave}/></button>
+							<button className="previous" onClick={this.previous} style={{display: (this.state.cEdit > 1) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleLeft} size="lg"/></button>
+							<label style={{display: (this.state.cEdit < 2) ? "inline" : "none"}}>&#92;({labels[0]}&#92;)</label>
+							<label style={{display: (this.state.cEdit === 2) ? "inline" : "none"}}>&#92;({labels[1]}&#92;)</label>
+							<label style={{display: (this.state.cEdit === 3) ? "inline" : "none"}}>&#92;({labels[2]}&#92;)</label>
+							<label style={{display: (this.state.cEdit === 4) ? "inline" : "none"}}>&#92;({labels[3]}&#92;)</label>
+							<input className={inputClasses[this.state.cEdit]} type="text" ref={(input) => { this.input = input; }} onKeyUp={this.inputHandler} placeholder={placeholders[this.state.cEdit]} onChange={()=>{}}/>
+							<button className="next" onClick={this.next} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleRight} size="lg"/></button>
+							<button className="edit" onClick={this.edit} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faPencilAlt}/></button>
+							<input className="jscolor" value="#3A539B" onChange={()=>{}}/>
+						</span>
 				</span>);
 	}
 }
@@ -241,7 +243,7 @@ class Canvas extends React.Component {
 		}, () => {
 			this.drawFrame();
 			for(let i = 0; i < animations.length; i++){
-				animations[i].execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], context);
+				animations[i].execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], context, this.drawFrame);
 			}
 		});
 	}
@@ -342,25 +344,72 @@ class ParamWrapper extends React.Component {
 	newCurve = () => {
 		//var curve = <Curve cindex={curves.length} delete={this.delete} />;
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
+		animations.push(new Animation(1, 0.5, 10, [[0, curves[0].length - 1]]));
 		this.setState({curves: curves});
 	};
 	newPCurve = () => {
 		curves[1].push(new Curve2d([], [], "#FFFFFF", 2));
+		animations.push(new Animation(1, 0.5, 10, [[1, curves[1].length - 1]]));
 		this.setState({curves: curves});
 	};
 	delete = (arg) => {
 		curves[arg[0]].splice(arg[1], 1);
+		//console.log(arg[1]);
+		let indice = [];
+		animations.forEach((el, ind) => {
+			el.curvInd = el.curvInd.filter((element, index) => {
+				if(element[0] == arg[0] && element[1] == arg[1]){
+					indice[0] = ind;
+					indice[1] = index;
+				};
+				return !(element[0] == arg[0] && element[1] == arg[1]);
+			});
+		});
+		animations.forEach((el, ind) => {
+			//console.log("Animation: " + el);
+			if(ind == indice[0]){
+				if(!!(el.curvInd[indice[1]])){
+					//el.curvInd.forEach((element) => console.log(element[0]));
+					el.curvInd.forEach((element, index) => {
+						if(index >= indice[1] && element[0] == arg[0]){
+							element[1]--;
+						}
+					});
+				}
+			}
+			if(ind > indice[0]){
+				el.curvInd.forEach((element, index) => {
+					if(element[0] == arg[0]){
+						element[1]--;
+					}
+				});
+			}
+		});
+		animations = animations.filter(el => el.curvInd.length > 0);
 		this.setState({curves: curves});
 	};
 	render(){
+		//{curves[0].map((el, ind) => <WrCurve key={ind} type={0} cindex={ind} delete={this.delete} />)}
+		//{curves[1].map((el, ind) => <WrCurve key={ind} type={1} cindex={ind} delete={this.delete} />)}
 		return (<div id="paramWrapper">
 					<RControls />
 					<div id="parameters">
 						<button id="addc" onClick={this.newCurve}> <FontAwesomeIcon icon={faPlus} /> FCurve </button>
 						<button id="addp" onClick={this.newPCurve}> <FontAwesomeIcon icon={faPlus} /> PCurve </button>
 						<div>
-							{curves[0].map((el, ind) => <WrCurve key={ind} type={0} cindex={ind} delete={this.delete} />)}
-							{curves[1].map((el, ind) => <WrCurve key={ind} type={1} cindex={ind} delete={this.delete} />)}
+							{animations.map((el, ind) => {
+									if(el.curvInd.length == 1){
+										return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} delete={this.delete} />; 																		
+									}
+									else{
+										return <span className="inputWrapper" key={ind}>
+												{el.curvInd.map((element, index) => {
+													return <WrCurve key={[element[0], element[1]].toString()} type={element[0]} cindex={element[1]} delete={this.delete} />
+												})}
+												</span>;
+									}
+								}
+							)}
 						</div><br/>
 					</div>
 				</div>);
@@ -371,6 +420,10 @@ class App extends React.Component {
 	constructor(props){
 		super(props);	
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
+		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
+		curves[1].push(new Curve2d([], [], "#FFFFFF", 2));
+		curves[1].push(new Curve2d([], [], "#FFFFFF", 2));
+		animations.push(new Animation(1, 0.5, 10, [[0, 0], [0, 1], [1, 0], [1, 1]]));
 		this.state = {curves: curves};
 	};
 	render(){
