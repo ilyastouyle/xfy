@@ -11,7 +11,7 @@ class Curve2d{
 	constructor(X, Y, color, width) {
 		this.X = X;
 		this.Y = Y;
-		this.color = color;
+		this.color = "#f3f1f3";
 		this.width = width;
 	}
 }
@@ -37,13 +37,13 @@ class Animation{
 			//no animation
 			case 0:
 				executeBefore();
-				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, "#000000", context);
+				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
 				break;
 			//morph curve1 into curve2 
 			case 1:
 				Animations.morph(this.animCurves, this.duration, this.fps, (tab1, tab2) => {
 					executeBefore();
-					Functions.drawCurve(this.animCurves[0].width, tab1, tab2, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, "#000000", context);
+					Functions.drawCurve(this.animCurves[0].width, tab1, tab2, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0], context);
 				});
 				break;
 		}
@@ -72,7 +72,6 @@ class WrCurve extends React.Component{
 	next = () => {
 		this.setState({ cEdit: (this.state.cEdit + 1) % 5, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)}, () => {
 			if(this.props.type === 0){
-				//curves[this.props.type][this.props.cindex].X = Functions.subdivide([this.state.tempF]);
 				if(!!this.state.tempF[1] && !!this.state.tempF[2]){
 					curves[this.props.type][this.props.cindex].X = Functions.subdivide(parseFloat(this.state.tempF[1]), parseFloat(this.state.tempF[2]), 100);
 					for(let i = 0; i < curves[this.props.type][this.props.cindex].X.length; i++){
@@ -80,6 +79,17 @@ class WrCurve extends React.Component{
 						curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(this.state.tempF[0]));
 					}
 				}
+			}
+			else{
+				if(!!this.state.tempF[1] && !!this.state.tempF[2] && !!this.state.tempF[3]){
+					//Subdivided t parameter values tab
+					let tab1 = Functions.subdivide(parseFloat(this.state.tempF[2]), parseFloat(this.state.tempF[3]), 100);
+					for(let i = 0; i < tab1.length; i++){
+						let t = tab1[i];
+						curves[this.props.type][this.props.cindex].X[i] = eval(Functions.evaluateInput(this.state.tempF[0]));
+						curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(this.state.tempF[1]));
+					}
+				}	
 			}
 		});
 		this.input.value = "";
@@ -109,7 +119,7 @@ class WrCurve extends React.Component{
 		return (<span className="input">
 						<span>
 							<button className="delete" onClick={() => {this.props.delete([this.props.type, this.props.cindex])}} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faCut}/></button>
-							<button className="dropdown" style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faAngleDown} size="lg"/></button>
+							<button className="dropdown" onClick={() => console.log("Drop Down")} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faAngleDown} size="lg"/></button>
 							<button className="save" onClick={this.save} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faSave}/></button>
 							<button className="previous" onClick={this.previous} style={{display: (this.state.cEdit > 1) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleLeft} size="lg"/></button>
 							<label style={{display: (this.state.cEdit < 2) ? "inline" : "none"}}>&#92;({labels[0]}&#92;)</label>
@@ -133,9 +143,13 @@ class Settings extends React.Component {
 	render(){
 		return (<div id="settWrapper">
 					<nav id="centerControls">
-						<h4>Settings</h4>
-						<button onClick={this.newCurve}> Reset </button>
-						<button onClick={this.newPCurve}> Save </button>
+						<span className="title">
+							<h4>Settings</h4>
+						</span>
+						<span className="buttons">
+							<button onClick={this.newCurve}> Reset </button>
+							<button onClick={this.newPCurve}> Save </button>
+						</span>
 					</nav>
 					<div id="fsettings">
 						<div className="row">
@@ -163,7 +177,7 @@ class Settings extends React.Component {
 						</div>
 						<div className="row">
 							<div className="column">
-								<label>Animation style: </label>
+								<label>Animation: </label>
 								<div className="container">
 									<button className="anim" id="noanim">No animation</button>
 									<button className="anim" id="completeb">Complete</button>
@@ -194,9 +208,10 @@ class Canvas extends React.Component {
 
 		this.state = { 
 			colors: { 
-				axeColor: "#000000",
-				wireColor: "#cdd1d3",
-				dashColor: "#1F3A93"
+				axeColor: "#e6e4e7",
+				wireColor: "#28262d",
+				dashColor: "#e6e4e7", 
+				curveColor: "#ebe9ec"
 			},
 			widths: {
 				axeWdith: [1, 1],
@@ -208,8 +223,8 @@ class Canvas extends React.Component {
 			},
 			drawnSteps: {
 				nbSteps: {
-					x: [12, 12],
-					y: [6, 6]
+					x: [9, 9],
+					y: [8, 8]
 				},
 				offStepSteps: {
 					x: [1, 1],
@@ -243,6 +258,7 @@ class Canvas extends React.Component {
 		}, () => {
 			this.drawFrame();
 			for(let i = 0; i < animations.length; i++){
+				console.log(animations[i]);
 				animations[i].execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], context, this.drawFrame);
 			}
 		});
@@ -254,20 +270,26 @@ class Canvas extends React.Component {
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		Functions.drawYAxis(canvas.width/2, A.colors.axeColor, canvas.height, A.widths.axeWidth, context);
 		Functions.drawXAxis(canvas.height/2, A.colors.axeColor, canvas.width, A.widths.axeWidth, context);
-		Functions.drawOnX(canvas.width/2, canvas.height/2, A.steps.x[0], A.drawnSteps.nbSteps.x[0], A.drawnSteps.stepSize.x[0], A.colors.wireColor, A.widths.dashWidth.x[0], A.widths.wireWidth[0], A.font.x[0], context);
-		Functions.drawOnY(canvas.width/2, canvas.height/2, A.steps.y[0], A.drawnSteps.nbSteps.y[0], A.drawnSteps.stepSize.y[0], A.colors.wireColor, A.widths.dashWidth.y[0], A.widths.wireWidth[0], A.font.y[0], context);
-		Functions.drawOnMinusX(canvas.width/2, canvas.height/2, A.steps.x[1], A.drawnSteps.nbSteps.x[0], A.drawnSteps.stepSize.x[1], A.colors.wireColor, A.widths.dashWidth.x[1], A.widths.wireWidth[0], A.font.x[1], context);
-		Functions.drawOnMinusY(canvas.width/2, canvas.height/2, A.steps.y[1], A.drawnSteps.nbSteps.y[1], A.drawnSteps.stepSize.y[1], A.colors.wireColor, A.widths.dashWidth.y[1], A.widths.wireWidth[0], A.font.y[1], context);
+		Functions.drawOnX(canvas.width/2, canvas.height/2, A.steps.x[0], A.drawnSteps.nbSteps.x[0], A.drawnSteps.stepSize.x[0], A.colors.dashColor, A.colors.wireColor, A.widths.dashWidth.x[0], A.widths.wireWidth[0], A.font.x[0], context);
+		Functions.drawOnY(canvas.width/2, canvas.height/2, A.steps.y[0], A.drawnSteps.nbSteps.y[0], A.drawnSteps.stepSize.y[0], A.colors.dashColor, A.colors.wireColor, A.widths.dashWidth.y[0], A.widths.wireWidth[0], A.font.y[0], context);
+		Functions.drawOnMinusX(canvas.width/2, canvas.height/2, A.steps.x[1], A.drawnSteps.nbSteps.x[0], A.drawnSteps.stepSize.x[1], A.colors.dashColor, A.colors.wireColor, A.widths.dashWidth.x[1], A.widths.wireWidth[0], A.font.x[1], context);
+		Functions.drawOnMinusY(canvas.width/2, canvas.height/2, A.steps.y[1], A.drawnSteps.nbSteps.y[1], A.drawnSteps.stepSize.y[1], A.colors.dashColor, A.colors.wireColor, A.widths.dashWidth.y[1], A.widths.wireWidth[0], A.font.y[1], context);
 	}
 	componentDidMount(){
-		this.setState({canvas: this.refs.canvasW});
+		this.setState({canvas: this.refs.canvasW}, () => {
+			this.setState(() => {
+				let tempSteps = this.state.drawnSteps;
+				let nbXSteps = parseInt((this.state.canvas.clientWidth/2)/tempSteps.stepSize.x[0]);
+				let nbYSteps = parseInt((this.state.canvas.clientHeight/2)/tempSteps.stepSize.y[0]);
+				tempSteps.nbSteps.x = [nbXSteps, nbXSteps];
+				tempSteps.nbSteps.y = [nbYSteps, nbYSteps];
+				return tempSteps;
+			});
+		});
 	}
 	componentDidUpdate(){
-		
-		//this.drawFrame();
-		//Functions.drawCurve(2, [-3, -2, -1, 0, 1, 2, 3], [9, 4, 1, 0, 1, 4, 9], [1, 1], [1, 1], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], canvas.width/2, canvas.height/2, "#000000", context);
+	
 	}
-
 	render(){
 		if(!this.state.canvas){
 			return (<div id="canvasWrapper">
@@ -330,7 +352,12 @@ class RControls extends React.Component {
 	}
 	render(){
 		return(<nav id="rightControls">
-					<b>Curves</b>
+					<span className="title">
+						<h4>Curves</h4>
+					</span>
+					<span className="buttons">
+						<button> Clear All </button>
+					</span>
 				</nav>);
 	}
 }
@@ -342,19 +369,17 @@ class ParamWrapper extends React.Component {
 	  this.state = {curves: curves};
 	}
 	newCurve = () => {
-		//var curve = <Curve cindex={curves.length} delete={this.delete} />;
-		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
-		animations.push(new Animation(1, 0.5, 10, [[0, curves[0].length - 1]]));
+		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
+		animations.push(new Animation(0, 0.5, 10, [[0, curves[0].length - 1]]));
 		this.setState({curves: curves});
 	};
 	newPCurve = () => {
-		curves[1].push(new Curve2d([], [], "#FFFFFF", 2));
-		animations.push(new Animation(1, 0.5, 10, [[1, curves[1].length - 1]]));
+		curves[1].push(new Curve2d([], [], "#FFFFFF", 3));
+		animations.push(new Animation(0, 0.5, 10, [[1, curves[1].length - 1]]));
 		this.setState({curves: curves});
 	};
 	delete = (arg) => {
 		curves[arg[0]].splice(arg[1], 1);
-		//console.log(arg[1]);
 		let indice = [];
 		animations.forEach((el, ind) => {
 			el.curvInd = el.curvInd.filter((element, index) => {
@@ -366,10 +391,8 @@ class ParamWrapper extends React.Component {
 			});
 		});
 		animations.forEach((el, ind) => {
-			//console.log("Animation: " + el);
 			if(ind == indice[0]){
 				if(!!(el.curvInd[indice[1]])){
-					//el.curvInd.forEach((element) => console.log(element[0]));
 					el.curvInd.forEach((element, index) => element[1] -= (index >= indice[1] && element[0] == arg[0]) ? 1 : 0);
 				}
 			}
@@ -381,8 +404,6 @@ class ParamWrapper extends React.Component {
 		this.setState({curves: curves});
 	};
 	render(){
-		//{curves[0].map((el, ind) => <WrCurve key={ind} type={0} cindex={ind} delete={this.delete} />)}
-		//{curves[1].map((el, ind) => <WrCurve key={ind} type={1} cindex={ind} delete={this.delete} />)}
 		return (<div id="paramWrapper">
 					<RControls />
 					<div id="parameters">
@@ -404,15 +425,18 @@ class ParamWrapper extends React.Component {
 							)}
 						</div><br/>
 					</div>
-				</div>);
+					<div id="logo">
+						<img src="drawing.svg" width="35%"/>
+					</div>
+				</div>);	
 	}
 }
 
 class App extends React.Component {
 	constructor(props){
 		super(props);	
-		curves[0].push(new Curve2d([], [], "#FFFFFF", 2));
-		animations.push(new Animation(1, 0.5, 10, [[0, 0]]));
+		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
+		animations.push(new Animation(0, 0.5, 10, [[0, 0]]));
 		this.state = {curves: curves};
 	};
 	render(){

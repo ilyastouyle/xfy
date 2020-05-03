@@ -167,12 +167,12 @@ let Functions = {
 			}	
 		}
 	},
-	drawOnX: function drawOnX(x, y, xstep, m, thestep, color, dashWidth, wireWidth, font, context){
+	drawOnX: function drawOnX(x, y, xstep, m, thestep, dashColor, wireColor, dashWidth, wireWidth, font, context){
 		for(let i = 1; i < m+1; i++){
-			this.drawYAxis(x + i*thestep, color, y*2, 1, context);
+			this.drawYAxis(x + i*thestep, wireColor, y*2, 1, context);
 		}
-		context.strokeStyle = "#1F3A93";
-		context.fillStyle = "#1F3A93";
+		context.strokeStyle = dashColor;
+		context.fillStyle = dashColor;
 		context.font = font;
 		context.beginPath();
 		let nbCommas = 0;
@@ -186,12 +186,12 @@ let Functions = {
 		}
 		context.stroke();
 	},
-	drawOnY: function drawOnY(x, y, ystep, m, thestep, color, dashWidth, wireWidth, font, context){
+	drawOnY: function drawOnY(x, y, ystep, m, thestep, dashColor, wireColor, dashWidth, wireWidth, font, context){
 		for(let i = 1; i < m+1; i++){
-			this.drawXAxis(y - i*thestep, color, x*2, wireWidth, context);
+			this.drawXAxis(y - i*thestep, wireColor, x*2, wireWidth, context);
 		}
-		context.strokeStyle = "#1F3A93";
-		context.fillStyle = "#1F3A93";
+		context.strokeStyle = dashColor;
+		context.fillStyle = dashColor;
 		context.font = font;
 		context.beginPath();
 		let nbCommas = 0;
@@ -218,12 +218,12 @@ let Functions = {
 		}
 		context.stroke();
 	},
-	drawOnMinusX: function drawOnMinusX(x, y, xstep, m, thestep, color, dashWidth, wireWidth, font, context){
+	drawOnMinusX: function drawOnMinusX(x, y, xstep, m, thestep, dashColor, wireColor, dashWidth, wireWidth, font, context){
 		for(let i = 1; i < m+1; i++){
-			this.drawYAxis(x - i*thestep, color, y*2, wireWidth, context);
+			this.drawYAxis(x - i*thestep, wireColor, y*2, wireWidth, context);
 		}
-		context.strokeStyle = "#1F3A93";
-		context.fillStyle = "#1F3A93";
+		context.strokeStyle = dashColor;
+		context.fillStyle = dashColor;
 		context.font = font;
 		context.beginPath();
 		let nbCommas = 0;
@@ -239,11 +239,12 @@ let Functions = {
 		}
 		context.stroke();
 	},
-	drawOnMinusY: function drawOnMinusY(x, y, ystep, m, thestep, color, dashWidth, wireWidth, font, context){
+	drawOnMinusY: function drawOnMinusY(x, y, ystep, m, thestep, dashColor, wireColor, dashWidth, wireWidth, font, context){
 		for(let i = 1; i < m+1; i++){
-			this.drawXAxis(y + i*thestep, color, x*2, wireWidth, context);
+			this.drawXAxis(y + i*thestep, wireColor, x*2, wireWidth, context);
 		}
-		context.strokeStyle = "#1F3A93";
+		context.strokeStyle = dashColor;
+		context.fillStyle = dashColor;
 		context.font = font;
 		context.beginPath();
 		let nbCommas = 0;
