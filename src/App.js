@@ -265,14 +265,16 @@ class Canvas extends React.Component {
 					//console.log("k: " + k);
 					if(k < (totalDuration*1000)/frameDuration){
 						k++;
+						drawFramePointer();
 						animations.forEach(el => {
 							let animation = el;
 							animation.fps = 1000/frameDuration;
-							animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context, drawFramePointer);
+							if(k <= (animation.duration*1000)/frameDuration){
+								animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context);					
+							}
 						});
 					}	
 					else{
-						console.log(mainLoop);
 						window.clearInterval(mainLoop);
 						mainLoop = 0;
 					}
@@ -283,10 +285,13 @@ class Canvas extends React.Component {
 				mainLoop = window.setInterval(function(){
 					if(k < (totalDuration*1000)/frameDuration){
 						k++;
+						drawFramePointer();
 						animations.forEach(el => {
 							let animation = el;
 							animation.fps = 1000/frameDuration;
-							animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context, drawFramePointer);
+							if((animation.duration*1000)/frameDuration <= k){
+								animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context);					
+							}
 						});
 					}	
 					else{
@@ -407,12 +412,12 @@ class ParamWrapper extends React.Component {
 	}
 	newCurve = () => {
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
-		animations.push(new Animation(0, 0.5, 10, [[0, curves[0].length - 1]]));
+		animations.push(new Animation(0, 1, 10, [[0, curves[0].length - 1]]));
 		this.setState({curves: curves});
 	};
 	newPCurve = () => {
 		curves[1].push(new Curve2d([], [], "#FFFFFF", 3));
-		animations.push(new Animation(0, 0.5, 10, [[1, curves[1].length - 1]]));
+		animations.push(new Animation(0, 1, 10, [[1, curves[1].length - 1]]));
 		this.setState({curves: curves});
 	};
 	delete = (arg) => {
