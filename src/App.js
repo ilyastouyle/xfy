@@ -5,7 +5,7 @@ import Functions from './Library';
 import Animations from './Animations';
 import './stylesheets/App.css';
 
-let curves = [[], []], animations = [];
+let curves = [[], []], animations = [], mainLoop = 0;
 
 class Curve2d{
 	constructor(X, Y, color, width) {
@@ -29,7 +29,7 @@ class Animation{
 		this.duration = duration;
 		this.fps = fps;
 	}
-	execute(steps, thestep, canvasDim, context, executeBefore = () => {} ){
+	execute(steps, thestep, canvasDim, frameNumber, context, executeBefore = () => {} ){
 		for(var i = 0; i < this.curvInd.length; i++){
 			this.animCurves.push(curves[this.curvInd[i][0]][this.curvInd[i][1]]);
 		}
@@ -41,7 +41,7 @@ class Animation{
 				break;
 			//morph curve1 into curve2 
 			case 1:
-				Animations.morph(this.animCurves, this.duration, this.fps, (tab1, tab2) => {
+				Animations.morph(this.animCurves, frameNumber, this.duration*this.fps, (tab1, tab2) => {
 					executeBefore();
 					Functions.drawCurve(this.animCurves[0].width, tab1, tab2, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0], context);
 				});
@@ -256,11 +256,48 @@ class Canvas extends React.Component {
 			newState.steps.y = [tstep, tstep];
 			return newState;
 		}, () => {
-			this.drawFrame();
-			for(let i = 0; i < animations.length; i++){
-				console.log(animations[i]);
-				animations[i].execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], context, this.drawFrame);
+			let frameDuration = Functions.Minimum(animations.map(el => 1000/(el.fps)));
+			let totalDuration = Functions.Maximum(animations.map(el => el.duration));
+			let k = 0;
+			let drawFramePointer = this.drawFrame;
+			if(!mainLoop){
+				mainLoop = window.setInterval(function(){
+					//console.log("k: " + k);
+					if(k < (totalDuration*1000)/frameDuration){
+						k++;
+						animations.forEach(el => {
+							let animation = el;
+							animation.fps = 1000/frameDuration;
+							animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context, drawFramePointer);
+						});
+					}	
+					else{
+						console.log(mainLoop);
+						window.clearInterval(mainLoop);
+						mainLoop = 0;
+					}
+				}, frameDuration);
 			}
+			else{
+				window.clearInterval(mainLoop);
+				mainLoop = window.setInterval(function(){
+					if(k < (totalDuration*1000)/frameDuration){
+						k++;
+						animations.forEach(el => {
+							let animation = el;
+							animation.fps = 1000/frameDuration;
+							animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context, drawFramePointer);
+						});
+					}	
+					else{
+						window.clearInterval(mainLoop);
+						mainLoop = 0;
+					}
+				}, frameDuration);
+			}
+			/*for(let i = 0; i < animations.length; i++){
+				animations[i].execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], context, this.drawFrame);
+			}*/
 		});
 	}
 	drawFrame = () => {
@@ -407,9 +444,11 @@ class ParamWrapper extends React.Component {
 		return (<div id="paramWrapper">
 					<RControls />
 					<div id="parameters">
-						<button id="addc" onClick={this.newCurve}> <FontAwesomeIcon icon={faPlus} /> FCurve </button>
-						<button id="addp" onClick={this.newPCurve}> <FontAwesomeIcon icon={faPlus} /> PCurve </button>
-						<div>
+						<div className="buttons">
+							<button id="addc" onClick={this.newCurve}> <FontAwesomeIcon icon={faPlus} /> FCurve </button>
+							<button id="addp" onClick={this.newPCurve}> <FontAwesomeIcon icon={faPlus} /> PCurve </button>
+						</div>
+						<div className="inputs">
 							{animations.map((el, ind) => {
 									if(el.curvInd.length == 1){
 										return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} delete={this.delete} />; 																		
@@ -436,7 +475,8 @@ class App extends React.Component {
 	constructor(props){
 		super(props);	
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
-		animations.push(new Animation(0, 0.5, 10, [[0, 0]]));
+		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
+		animations.push(new Animation(1, 5, 10, [[0, 0], [0, 1]]));
 		this.state = {curves: curves};
 	};
 	render(){
