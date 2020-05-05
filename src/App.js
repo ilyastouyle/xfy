@@ -5,7 +5,9 @@ import Functions from './Library';
 import Animations from './Animations';
 import './stylesheets/App.css';
 
-let curves = [[], []], animations = [], mainLoop = 0;
+let curves = [[], []], animations = []
+//Global variables linked to canvas (for execution, pausing and stopping animation)
+let frameDuration = 0, totalDuration = 0, k = 0, mainLoop = 0, paused = false;
 
 class Curve2d{
 	constructor(X, Y, color, width) {
@@ -18,14 +20,16 @@ class Curve2d{
 class Animation{
 	/* 
 		type: type of animation (Integer) 
+		anchor: starting point in time (Float)
 		duration: duration of animation in seconds (Float)
 		fps: frames per second (Integer)
 		curvInd: the curves involved in the animation ([[0 or 1, index],[...],...])
 	*/
-	constructor(type, duration, fps, curvInd){
+	constructor(type, anchor, duration, fps, curvInd){
 		this.type = type;
 		this.curvInd = curvInd;
 		this.animCurves = [];
+		this.anchor = anchor;
 		this.duration = duration;
 		this.fps = fps;
 	}
@@ -119,7 +123,7 @@ class WrCurve extends React.Component{
 		return (<span className="input">
 						<span>
 							<button className="delete" onClick={() => {this.props.delete([this.props.type, this.props.cindex])}} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faCut}/></button>
-							<button className="dropdown" onClick={() => console.log("Drop Down")} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faAngleDown} size="lg"/></button>
+							<button className="dropdown" onClick={() => this.props.showSett([this.props.type, this.props.cindex])} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faAngleDown} size="lg"/></button>
 							<button className="save" onClick={this.save} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faSave}/></button>
 							<button className="previous" onClick={this.previous} style={{display: (this.state.cEdit > 1) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleLeft} size="lg"/></button>
 							<label style={{display: (this.state.cEdit < 2) ? "inline" : "none"}}>&#92;({labels[0]}&#92;)</label>
@@ -139,12 +143,22 @@ class Settings extends React.Component {
 		super(props);
 		
 		this.state = {};
-	};
+	}
+	componentDidMount(){
+		window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, "settWrapper"]);
+	}
 	render(){
+		let title;
+		if(this.props.currentSett[0] == 0){
+			title = "f_{11}(x)";
+		}
+		else{
+
+		}
 		return (<div id="settWrapper">
 					<nav id="centerControls">
 						<span className="title">
-							<h4>Settings</h4>
+							<label>Settings</label>
 						</span>
 						<span className="buttons">
 							<button onClick={this.newCurve}> Reset </button>
@@ -152,6 +166,9 @@ class Settings extends React.Component {
 						</span>
 					</nav>
 					<div id="fsettings">
+						<div className="row curvename">
+							<label>&#92;({title}&#92;)</label>
+						</div>
 						<div className="row">
 							<div className="column">
 								<label>Curve thickness: </label>
@@ -242,9 +259,14 @@ class Canvas extends React.Component {
 			steps: {
 				x: [.25, .25],
 				y: [.25, .25]
-			}};
+			},
+			//Variable for updating time display
+			count: 0
+		};
 	}
 	play = () => {
+		//Don't delete, pointer is to be used inside setInterval
+		let pointer = this;
 		let A = this.state;
 		const canvas = this.refs.canvas;
 		const context = canvas.getContext("2d");
@@ -256,54 +278,57 @@ class Canvas extends React.Component {
 			newState.steps.y = [tstep, tstep];
 			return newState;
 		}, () => {
-			let frameDuration = Functions.Minimum(animations.map(el => 1000/(el.fps)));
-			let totalDuration = Functions.Maximum(animations.map(el => el.duration));
-			let k = 0;
+			//frameDuration in milliseconds
+			frameDuration = Functions.Minimum(animations.map(el => 1000/(el.fps)));
+			//totalDuration in seconds
+			totalDuration = Functions.Maximum(animations.map(el => el.anchor + el.duration));
 			let drawFramePointer = this.drawFrame;
-			if(!mainLoop){
-				mainLoop = window.setInterval(function(){
-					//console.log("k: " + k);
-					if(k < (totalDuration*1000)/frameDuration){
-						k++;
-						drawFramePointer();
-						animations.forEach(el => {
-							let animation = el;
-							animation.fps = 1000/frameDuration;
-							if(k <= (animation.duration*1000)/frameDuration){
-								animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context);					
-							}
-						});
-					}	
-					else{
-						window.clearInterval(mainLoop);
-						mainLoop = 0;
-					}
-				}, frameDuration);
-			}
-			else{
+			//If animation already running
+			if(!!mainLoop){
 				window.clearInterval(mainLoop);
-				mainLoop = window.setInterval(function(){
-					if(k < (totalDuration*1000)/frameDuration){
-						k++;
-						drawFramePointer();
-						animations.forEach(el => {
-							let animation = el;
-							animation.fps = 1000/frameDuration;
-							if((animation.duration*1000)/frameDuration <= k){
-								animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k, context);					
-							}
-						});
-					}	
-					else{
-						window.clearInterval(mainLoop);
-						mainLoop = 0;
-					}
-				}, frameDuration);
+				//If not paused start from the beginning
+				if(!paused) {
+					k = 0;
+				}
 			}
+			//Either way set paused to false since it's playing now
+			paused = false;
+			mainLoop = window.setInterval(function(){
+				//console.log("k: " + k);
+				if(k < (totalDuration*1000)/frameDuration){
+					k++;
+					drawFramePointer();
+					animations.forEach((el, ind) => {
+						let animation = el;
+						animation.fps = 1000/frameDuration;
+						if(((k >= animation.anchor*animation.fps) && (k <= ((animation.anchor*animation.fps) + (animation.duration*animation.fps))))){
+							//Feeding the execute function (k - animation.anchor*animation.fps) instead of k, as if the animation just started with its anchor 
+							animation.execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], k - animation.anchor*animation.fps, context);					
+						}
+					});
+					pointer.setState({count: k});
+				}	
+				else{
+					window.clearInterval(mainLoop);
+					mainLoop = 0;
+					k = 0;
+				}
+			}, frameDuration);
 			/*for(let i = 0; i < animations.length; i++){
 				animations[i].execute([A.steps.x, A.steps.y], [A.drawnSteps.stepSize.x, A.drawnSteps.stepSize.y], [canvas.width, canvas.height], context, this.drawFrame);
 			}*/
 		});
+	}
+	pause = () => {
+		window.clearInterval(mainLoop);
+		paused = true;
+		this.setState({count: k});
+	}
+	stop = () => {
+		window.clearInterval(mainLoop);
+		mainLoop = 0;
+		k = 0;
+		this.setState({count: k}, this.drawFrame);
 	}
 	drawFrame = () => {
 		let A = this.state;
@@ -318,6 +343,7 @@ class Canvas extends React.Component {
 		Functions.drawOnMinusY(canvas.width/2, canvas.height/2, A.steps.y[1], A.drawnSteps.nbSteps.y[1], A.drawnSteps.stepSize.y[1], A.colors.dashColor, A.colors.wireColor, A.widths.dashWidth.y[1], A.widths.wireWidth[0], A.font.y[1], context);
 	}
 	componentDidMount(){
+		console.log("Mounting");
 		this.setState({canvas: this.refs.canvasW}, () => {
 			this.setState(() => {
 				let tempSteps = this.state.drawnSteps;
@@ -330,18 +356,17 @@ class Canvas extends React.Component {
 		});
 	}
 	componentDidUpdate(){
-	
 	}
 	render(){
 		if(!this.state.canvas){
-			return (<div id="canvasWrapper">
-					<LControls play={this.play}/>
+			return (<div id="canvasWrapper" style={{width: (!this.props.settStatus) ? "80%" : "50%"}}>
+					<LControls play={this.play} pause={this.pause} stop={this.stop} count={(this.state.count*frameDuration)/1000}/>
 					<div id="canvas" ref="canvasW"></div>
 				</div>);
 		}
 		else{
-			return (<div id="canvasWrapper">
-					<LControls play={this.play}/>
+			return (<div id="canvasWrapper" style={{width: (!this.props.settStatus) ? "80%" : "50%"}}>
+					<LControls play={this.play} pause={this.pause} stop={this.stop} count={(this.state.count*frameDuration)/1000}/>
 					<div id="canvas" ref="canvasW">
 						<canvas ref="canvas" id="graph" width={this.state.canvas.clientWidth} height={this.state.canvas.clientHeight}></canvas>
 						<canvas id="toplayer" width={this.state.canvas.clientWidth} height={this.state.canvas.clientHeight}></canvas>
@@ -364,11 +389,12 @@ class LControls extends React.Component {
 					</span>
 					<nav>	
 						<button onClick={this.props.play}><FontAwesomeIcon icon={faPlay} /></button>
-						<button><FontAwesomeIcon icon={faPause} /></button>
-						<button><FontAwesomeIcon icon={faStop} /></button>
+						<button onClick={this.props.pause}><FontAwesomeIcon icon={faPause} /></button>
+						<button onClick={this.props.stop}><FontAwesomeIcon icon={faStop} /></button>
 					</nav>				
 					<span>
-						<h4>4 seconds </h4>
+						<h4 className="count">{this.props.count}</h4>
+						<h4 className="seconds"> s </h4>
 					</span>
 					<nav>
 						<button><FontAwesomeIcon icon={faSearchPlus} /></button>
@@ -412,17 +438,18 @@ class ParamWrapper extends React.Component {
 	}
 	newCurve = () => {
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
-		animations.push(new Animation(0, 1, 10, [[0, curves[0].length - 1]]));
+		animations.push(new Animation(0, 0, 1, 10, [[0, curves[0].length - 1]]));
 		this.setState({curves: curves});
 	};
 	newPCurve = () => {
 		curves[1].push(new Curve2d([], [], "#FFFFFF", 3));
-		animations.push(new Animation(0, 1, 10, [[1, curves[1].length - 1]]));
+		animations.push(new Animation(0, 0, 1, 10, [[1, curves[1].length - 1]]));
 		this.setState({curves: curves});
 	};
 	delete = (arg) => {
 		curves[arg[0]].splice(arg[1], 1);
 		let indice = [];
+		//Deleting curve from relevant animation
 		animations.forEach((el, ind) => {
 			el.curvInd = el.curvInd.filter((element, index) => {
 				if(element[0] == arg[0] && element[1] == arg[1]){
@@ -432,6 +459,7 @@ class ParamWrapper extends React.Component {
 				return !(element[0] == arg[0] && element[1] == arg[1]);
 			});
 		});
+		//Adjusting curve indices after deletion
 		animations.forEach((el, ind) => {
 			if(ind == indice[0]){
 				if(!!(el.curvInd[indice[1]])){
@@ -442,7 +470,10 @@ class ParamWrapper extends React.Component {
 				el.curvInd.forEach((element, index) => element[1] -= (element[0] == arg[0]) ? 1 : 0);
 			}
 		});
+		//Deleting empty animations that may be due to deletion
 		animations = animations.filter(el => el.curvInd.length > 0);
+		//Ajdusting animations left with only one curve by setting their type to 0
+		animations.forEach(el => {if(el.curvInd.length == 1) el.type = 0}); 
 		this.setState({curves: curves});
 	};
 	render(){
@@ -456,12 +487,12 @@ class ParamWrapper extends React.Component {
 						<div className="inputs">
 							{animations.map((el, ind) => {
 									if(el.curvInd.length == 1){
-										return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} delete={this.delete} />; 																		
+										return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} delete={this.delete} showSett={this.props.showSett}/>; 																		
 									}
 									else{
 										return <span className="inputWrapper" key={ind}>
 												{el.curvInd.map((element, index) => {
-													return <WrCurve key={[element[0], element[1]].toString()} type={element[0]} cindex={element[1]} delete={this.delete} />
+													return <WrCurve key={[element[0], element[1]].toString()} type={element[0]} cindex={element[1]} delete={this.delete} showSett={this.props.showSett}/>
 												})}
 												</span>;
 									}
@@ -480,18 +511,30 @@ class App extends React.Component {
 	constructor(props){
 		super(props);	
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
-		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
-		animations.push(new Animation(1, 5, 10, [[0, 0], [0, 1]]));
-		this.state = {curves: curves};
+		animations.push(new Animation(1, 0, 1, 10, [[0, 0]]));
+		this.state = {curves: curves, settStatus: false, currentSett: [0, 0]};
 	};
+	showSett = (curveInd) => {
+		this.setState({settStatus: true, currentSett: curveInd});
+	}
 	render(){
-		return (<div id="main">
+		if(this.state.settStatus){
+			return (<div id="main">
 					<div id="core">
-						<Canvas/>
-						<Settings/>
-						<ParamWrapper/>
+						<Canvas settStatus={this.state.settStatus}/>
+						<Settings currentSett={this.state.currentSett}/>
+						<ParamWrapper showSett={this.showSett}/>
 					</div>
 				</div>);
+		}
+		else{
+			return (<div id="main">
+					<div id="core">
+						<Canvas settStatus={this.state.settStatus}/>
+						<ParamWrapper showSett={this.showSett}/>
+					</div>
+				</div>);
+		}
 	}
 }
 

@@ -88,10 +88,10 @@ let Functions = {
 		else{
 			if(Math.abs(mx) >= 1){
 				let a = 0;
-				while(Math.pow(10,-a)*(nbSteps[0] - nbOffSteps[0]) >= 1){
+				while(Math.pow(10,-a)*(nbSteps[0] - nbOffSteps[0]) >= Math.abs(mx)){
 					a++;
 				}
-				while(d*Math.pow(10, -a)*(nbSteps[0] - nbOffSteps[0]) < 1){
+				while(d*Math.pow(10, -a)*(nbSteps[0] - nbOffSteps[0]) < Math.abs(mx)){
 					d++;
 				};
 				return parseFloat((d*Math.pow(10, -a)).toFixed(a));
@@ -124,10 +124,10 @@ let Functions = {
 		if(Math.abs(mn) >= Math.abs(mx)){
 			if(Math.abs(mn) >= 1){
 				let a = 0;
-				while(Math.pow(10,-a)*(nbSteps[1] - nbOffSteps[1]) >= 1){
+				while(Math.pow(10,-a)*(nbSteps[1] - nbOffSteps[1]) >= Math.abs(mn)){
 					a++;
 				}
-				while(d*Math.pow(10, -a)*(nbSteps[1] - nbOffSteps[1]) < 1){
+				while(d*Math.pow(10, -a)*(nbSteps[1] - nbOffSteps[1]) < Math.abs(mn)){
 					d++;
 				};
 				return parseFloat((d*Math.pow(10, -a)).toFixed(a));
@@ -147,10 +147,10 @@ let Functions = {
 		else{
 			if(Math.abs(mx) >= 1){
 				let a = 0;
-				while(Math.pow(10,-a)*(nbSteps[0] - nbOffSteps[0]) >= 1){
+				while(Math.pow(10,-a)*(nbSteps[0] - nbOffSteps[0]) >= Math.abs(mx)){
 					a++;
 				}
-				while(d*Math.pow(10, -a)*(nbSteps[0] - nbOffSteps[0]) < 1){
+				while(d*Math.pow(10, -a)*(nbSteps[0] - nbOffSteps[0]) < Math.abs(mx)){
 					d++;
 				};
 				return parseFloat((d*Math.pow(10, -a)).toFixed(a));
