@@ -1,20 +1,49 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faAngleDown, faSave, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faCog, faSave, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
 import Functions from './Library';
 import Animations from './Animations';
+import { SketchPicker } from 'react-color';
 import './stylesheets/App.css';
 
+//Number of subdivisions of X (and thus Y) 
+let nbSubdiv = 100;
 let curves = [[], []], animations = []
 //Global variables linked to canvas (for execution, pausing and stopping animation)
 let frameDuration = 0, totalDuration = 0, k = 0, mainLoop = 0, paused = false;
 
+//Function for finding animation involving given curve indices
+function findInd(cInd){
+	let indice = [];
+	animations.forEach((el, ind) => {
+		el.curvInd.forEach((element, index) => {
+			if(element[0] == cInd[0] && element[1] == cInd[1]){
+				indice[0] = ind;
+				indice[1] = index;
+			};
+		});
+	});
+	return indice;
+}
+//Function for computing and return delimiters, takes in :
+//delimiter width, index, place of delimiter between 0 & nbSubdiv, 
+//and number of subdivisions of the delimiter curve (the line), dashes, color
+function createDelim(width, cInd, x, nbS, dashes, color){
+	let y = eval(Functions.evaluateInput(curves[cInd[0]][cInd[1]].expression[0]));
+	let delimiterX = Functions.subdivide(x, x, nbS);
+	let delimiterY = Functions.subdivide(0, y, nbS);
+	return (new Curve2d(delimiterX, delimiterY, color, width, dashes));
+}
 class Curve2d{
-	constructor(X, Y, color, width) {
+	constructor(X, Y, color, width, dashes) {
 		this.X = X;
 		this.Y = Y;
 		this.color = "#f3f1f3";
+		//DONT DELETE
+		this.borderColor = "#dbd9db";
 		this.width = width;
+		this.dashes = dashes;
+		this.expressions = [""];
 	}
 }
 class Animation{
@@ -34,25 +63,88 @@ class Animation{
 		this.fps = fps;
 	}
 	execute(steps, thestep, canvasDim, frameNumber, context, executeBefore = () => {} ){
-		for(var i = 0; i < this.curvInd.length; i++){
+		for(let i = 0; i < this.curvInd.length; i++){
 			this.animCurves.push(curves[this.curvInd[i][0]][this.curvInd[i][1]]);
 		}
 		switch(this.type){
 			//no animation
 			case 0:
 				executeBefore();
-				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
+				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].dashes, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
+				//let delimitercreateDelim(2, this.curvInd[0], 0, 50, [1, 1], this.animCurves[0].color);
+				//Draw Delimiters
+				//Functions.drawCurve(2, [1, 2], this.delimitersLX, this.delimitersLY, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
+				//Functions.drawCurve(2, [1, 2], this.delimitersRX, this.delimitersRY, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
 				break;
 			//morph curve1 into curve2 
 			case 1:
 				Animations.morph(this.animCurves, frameNumber, this.duration*this.fps, (tab1, tab2) => {
 					executeBefore();
-					Functions.drawCurve(this.animCurves[0].width, tab1, tab2, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0], context);
+					Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].dashes, tab1, tab2, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0], context);
 				});
 				break;
 		}
 	}
 };
+
+class ColorPicker extends React.Component{
+	state = {
+	    displayColorPicker: false,
+	    color: this.props.color,
+	    borderColor: this.props.borderColor
+  	};
+
+  	handleClick = () => {
+    	this.setState({ displayColorPicker: !this.state.displayColorPicker })
+  	};
+
+	handleClose = () => {
+		this.setState({ displayColorPicker: false })
+	};
+
+ 	handleChange = (color) => {
+ 		let colorRgb = color.rgb;
+ 		let borderColor = "rgb(" + (colorRgb.r * 0.5) + "," + (colorRgb.g * 0.5) + "," + (colorRgb.b * 0.5) + ")";
+    	this.setState({ color: color.hex, borderColor: borderColor }, () => this.props.update([color.hex, borderColor]))
+  	};
+
+	render() {
+
+		const styles = {
+	        button: {
+		        width: "30px",
+		        height: "30px",
+		        borderRadius: "50%",
+		        border: "2px solid",
+		        borderColor: this.state.borderColor,
+	        	backgroundColor: this.state.color
+	        },
+	        popover: {
+	          	position: "absolute",
+	          	zIndex: "2",
+	          	marginTop: "1.5%",
+	          	right: '20%'
+	        },
+	        cover: {
+	          	position: "fixed",
+		        top: "0px",
+		        right: "0px",
+		        bottom: "0px",
+		        left: "0px"
+	        }
+	    };
+
+	    return (
+	      		<div>
+	        		<button style={ styles.button } onClick={ this.handleClick } />
+	        		{ this.state.displayColorPicker ? <div style={ styles.popover }>
+	          			<div style={ styles.cover } onClick={ this.handleClose }/>
+	          			<SketchPicker color={ this.state.color } onChange={ this.handleChange } />
+	        		</div> : null }
+	      		</div>
+	    		)
+	}
+}
 
 //Wrapper Curve: Template for Functional and Parameterized Curves
 class WrCurve extends React.Component{
@@ -76,8 +168,9 @@ class WrCurve extends React.Component{
 	next = () => {
 		this.setState({ cEdit: (this.state.cEdit + 1) % 5, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)}, () => {
 			if(this.props.type === 0){
+				curves[this.props.type][this.props.cindex].expression = [this.state.tempF[0]];
 				if(!!this.state.tempF[1] && !!this.state.tempF[2]){
-					curves[this.props.type][this.props.cindex].X = Functions.subdivide(parseFloat(this.state.tempF[1]), parseFloat(this.state.tempF[2]), 100);
+					curves[this.props.type][this.props.cindex].X = Functions.subdivide(parseFloat(this.state.tempF[1]), parseFloat(this.state.tempF[2]), nbSubdiv);
 					for(let i = 0; i < curves[this.props.type][this.props.cindex].X.length; i++){
 						let x = (curves[this.props.type][this.props.cindex].X)[i];
 						curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(this.state.tempF[0]));
@@ -85,9 +178,10 @@ class WrCurve extends React.Component{
 				}
 			}
 			else{
+				curves[this.props.type][this.props.cindex].expression = [this.state.tempF[0], this.state.tempF[1]];
 				if(!!this.state.tempF[1] && !!this.state.tempF[2] && !!this.state.tempF[3]){
 					//Subdivided t parameter values tab
-					let tab1 = Functions.subdivide(parseFloat(this.state.tempF[2]), parseFloat(this.state.tempF[3]), 100);
+					let tab1 = Functions.subdivide(parseFloat(this.state.tempF[2]), parseFloat(this.state.tempF[3]), nbSubdiv);
 					for(let i = 0; i < tab1.length; i++){
 						let t = tab1[i];
 						curves[this.props.type][this.props.cindex].X[i] = eval(Functions.evaluateInput(this.state.tempF[0]));
@@ -111,6 +205,7 @@ class WrCurve extends React.Component{
 	};
 	render(){
 		let inputClasses = [], placeholders = [], labels = [];
+		let selected = ((this.props.currentSett[0] == this.props.type) && (this.props.currentSett[1] == this.props.cindex));
 		if(this.props.type === 0){
 			inputClasses = ["f", "selected f", "selected value", "selected value", "selected value"]; 
 			placeholders = ["cos(sin(x))", "cos(sin(x))", "-1", "1", "100"];
@@ -120,61 +215,75 @@ class WrCurve extends React.Component{
 			placeholders = ["cos(t)", "cos(t)", "sin(t)", "-4", "4"];
 			labels = ["x_{ " + (this.props.cindex + 1) + " }(t)", "y_{ " + (this.props.cindex + 1) + " }(t)", "a", "b"];
 		} 
-		return (<span className="input">
-						<span>
-							<button className="delete" onClick={() => {this.props.delete([this.props.type, this.props.cindex])}} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faCut}/></button>
-							<button className="dropdown" onClick={() => this.props.showSett([this.props.type, this.props.cindex])} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faAngleDown} size="lg"/></button>
-							<button className="save" onClick={this.save} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faSave}/></button>
-							<button className="previous" onClick={this.previous} style={{display: (this.state.cEdit > 1) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleLeft} size="lg"/></button>
-							<label style={{display: (this.state.cEdit < 2) ? "inline" : "none"}}>&#92;({labels[0]}&#92;)</label>
-							<label style={{display: (this.state.cEdit === 2) ? "inline" : "none"}}>&#92;({labels[1]}&#92;)</label>
-							<label style={{display: (this.state.cEdit === 3) ? "inline" : "none"}}>&#92;({labels[2]}&#92;)</label>
-							<label style={{display: (this.state.cEdit === 4) ? "inline" : "none"}}>&#92;({labels[3]}&#92;)</label>
-							<input className={inputClasses[this.state.cEdit]} type="text" ref={(input) => { this.input = input; }} onKeyUp={this.inputHandler} placeholder={placeholders[this.state.cEdit]} onChange={()=>{}}/>
-							<button className="next" onClick={this.next} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleRight} size="lg"/></button>
-							<button className="edit" onClick={this.edit} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faPencilAlt}/></button>
-							<input className="jscolor" value="#3A539B" onChange={()=>{}}/>
-						</span>
+		return (<span className="input" style={{opacity: (selected) ? 0.4 : 1, pointerEvents: (selected) ? "none" : "auto" }}>
+					<div>
+						<button className="openS" onClick={() => {if(!this.props.settStatus) this.props.showSett([this.props.type, this.props.cindex])}} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faCog}/></button>
+						<button className="save" onClick={this.save} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faSave}/></button>
+						<button className="previous" onClick={this.previous} style={{display: (this.state.cEdit > 1) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleLeft} size="lg"/></button>
+						<label style={{display: (this.state.cEdit < 2) ? "inline" : "none"}}>&#92;({labels[0]}&#92;)</label>
+						<label style={{display: (this.state.cEdit === 2) ? "inline" : "none"}}>&#92;({labels[1]}&#92;)</label>
+						<label style={{display: (this.state.cEdit === 3) ? "inline" : "none"}}>&#92;({labels[2]}&#92;)</label>
+						<label style={{display: (this.state.cEdit === 4) ? "inline" : "none"}}>&#92;({labels[3]}&#92;)</label>
+						<input className={inputClasses[this.state.cEdit]} type="text" ref={(input) => { this.input = input; }} onKeyUp={this.inputHandler} placeholder={placeholders[this.state.cEdit]} onChange={()=>{}}/>
+						<button className="next" onClick={this.next} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleRight} size="lg"/></button>
+						<button className="edit" onClick={this.edit} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faPencilAlt}/></button>
+					</div>
+					<div className="delete" style={{display: (this.state.cEdit || this.props.settStatus) ? "none" : "inline"}}>
+						<button className="delete" onClick={() => {this.props.delete([this.props.type, this.props.cindex])}}><FontAwesomeIcon icon={faTimes}/></button>
+					</div>
 				</span>);
 	}
 }
 class Settings extends React.Component {
 	constructor(props){
 		super(props);
-		
-		this.state = {};
+		let ind = this.props.currentSett;
+		this.state = {
+			ind: ind,
+			thickness: curves[ind[0]][ind[1]].width,
+			dashes: curves[ind[0]][ind[1]].dashes,
+			delimiters: curves[ind[0]][ind[1]].dashes,
+			color: curves[ind[0]][ind[1]].color,
+			borderColor: curves[ind[0]][ind[1]].borderColor,
+			anchor: animations[(findInd(ind))[0]].anchor,
+			duration: animations[(findInd(ind))[0]].duration,
+			animType: animations[(findInd(ind))[0]].type
+		};
 	}
 	componentDidMount(){
 		window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, "settWrapper"]);
 	}
+	save = () => {
+		let ind = this.state.ind;
+		curves[ind[0]][ind[1]].width = this.state.thickness;
+		curves[ind[0]][ind[1]].color = this.state.color;
+		curves[ind[0]][ind[1]].borderColor = this.state.borderColor;
+		curves[ind[0]][ind[1]].dashes = this.state.dashes;
+		animations[findInd(ind)[0]].anchor = this.state.anchor;
+		animations[findInd(ind)[0]].duration = this.state.duration;
+		this.props.hide();
+	}
+	//<SketchPicker color={(!!this.state.color.hex) ? this.state.color.hex : this.state.color} onChangeComplete={(color) => this.setState({color: color})}/>
+	//<ColorPicker color={this.state.curveColor} update={(color) => this.setState({curveColor: color})} />
 	render(){
-		let title;
-		if(this.props.currentSett[0] == 0){
-			title = "f_{11}(x)";
-		}
-		else{
-
-		}
+		let ind = this.state.ind;
 		return (<div id="settWrapper">
 					<nav id="centerControls">
 						<span className="title">
 							<label>Settings</label>
 						</span>
 						<span className="buttons">
-							<button onClick={this.newCurve}> Reset </button>
-							<button onClick={this.newPCurve}> Save </button>
+							<button onClick={this.reset}> Reset </button>
+							<button onClick={this.save}> Save </button>
 						</span>
 					</nav>
 					<div id="fsettings">
-						<div className="row curvename">
-							<label>&#92;({title}&#92;)</label>
-						</div>
 						<div className="row">
 							<div className="column">
 								<label>Curve thickness: </label>
-								<span className="scontainer"><span className="thickness" id="thn"></span></span>
-								<span className="scontainer selected"><span className="thickness" id="md"></span></span>
-								<span className="scontainer"><span className="thickness" id="thk"></span></span>
+								<input type="text" id="thickness" value={this.state.thickness} onChange={(e) => {if(!isNaN(e.target.value) && e.target.value != "") this.setState({thickness: parseInt(e.target.value)})}} maxLength="3" />
+								<button id="thicker" onClick={() => this.setState({thickness: (this.state.thickness+1)})}><b>+</b></button>
+								<button id="thinner" onClick={() => {if(this.state.thickness > 1) this.setState({thickness: (this.state.thickness-1)})}}><b>-</b></button>
 							</div>
 							<div className="column">
 								<label>Divide into: </label>
@@ -184,34 +293,68 @@ class Settings extends React.Component {
 						<div className="row">
 							<div className="column">
 								<label>Dash size &amp; spacing: </label>
-								<input id="dash" placeholder="3" /> &amp;
-								<input id="spacing" placeholder="2" />
+								<input id="dash" placeholder="1" value={(this.state.dashes[0] == -1) ? "" : this.state.dashes[0]} onChange={(e) => {
+										if(e.target.value == ""){
+											this.setState({dashes: [-1, this.state.dashes[1]]});
+										}
+										else{
+											if(!isNaN(e.target.value)){ 
+												this.setState({dashes: [parseInt(e.target.value), this.state.dashes[1]]});
+											}
+										}
+									}}/> :
+								<input id="spacing" placeholder="0" value={(this.state.dashes[1] == -1) ? "" : this.state.dashes[1]} onChange={(e) => {
+										if(e.target.value == ""){
+											this.setState({dashes: [this.state.dashes[0], -1]});
+										}
+										else{
+											if(!isNaN(e.target.value)){ 
+												this.setState({dashes: [this.state.dashes[0], parseInt(e.target.value)]});
+											}
+										}
+								}}/>
+							</div>
+							<div className="column">
+								<label>Color: </label>
+								<ColorPicker update={(color) => this.setState({color: color[0], borderColor: color[1]})} color={this.state.color} borderColor={this.state.borderColor}/>
+							</div>
+						</div>
+						<div className="row">
+							<div className="column">
+								<label>Starting time: </label>
+								<input type="text" id="anchor" value={this.state.anchor} onChange={(e) => this.setState({anchor: parseInt(e.target.value)})}/> seconds
 							</div>
 							<div className="column">
 								<label>Duration: </label>
-								<input type="text" id="duration" /> seconds
+								<input type="text" id="duration" value={this.state.duration} onChange={(e) => this.setState({duration: parseInt(e.target.value)})}/> seconds
 							</div>
 						</div>
 						<div className="row">
 							<div className="column">
 								<label>Animation: </label>
 								<div className="container">
-									<button className="anim" id="noanim">No animation</button>
-									<button className="anim" id="completeb">Complete</button>
-									<button className="anim" id="chase">Chase</button>
-									<button className="anim" id="morph">Morph</button>
-									<button className="anim" id="rotate">Rotate</button>
-									<button className="anim" id="recompose">Recompose</button>
-									<button className="anim" id="mover">Scroll right</button>
-									<button className="anim" id="movel">Scroll left</button>
-									<button className="anim" id="moveu">Scroll up</button>
-									<button className="anim" id="moved">Scroll down</button>
+									<button className={(this.state.animType == 0) ? "anim selected" : "anim"} id="noanim" onClick={() => this.setState({animType: 0})}>No animation</button>
+									<button className={(this.state.animType == 1) ? "anim selected" : "anim"} id="morph" onClick={() => this.setState({animType: 1})}>Morph</button>
+									<button className={(this.state.animType == 2) ? "anim selected" : "anim"} id="completeb">Complete</button>
+									<button className={(this.state.animType == 3) ? "anim selected" : "anim"} id="chase">Chase</button>
+									<button className={(this.state.animType == 4) ? "anim selected" : "anim"} id="rotate">Rotate</button>
+									<button className={(this.state.animType == 5) ? "anim selected" : "anim"} id="recompose">Recompose</button>
+									<button className={(this.state.animType == 6) ? "anim selected" : "anim"} id="mover">Scroll right</button>
+									<button className={(this.state.animType == 7) ? "anim selected" : "anim"} id="movel">Scroll left</button>
+									<button className={(this.state.animType == 8) ? "anim selected" : "anim"} id="moveu">Scroll up</button>
+									<button className={(this.state.animType == 9) ? "anim selected" : "anim"} id="moved">Scroll down</button>
 								</div>
 							</div>
 						</div>
 						<div className="row">
 							<div className="column">
-								<button>Opaque</button>	
+								<label>Delimiters</label>
+								<button>Left</button>
+								<button>Right</button>
+							</div>
+							<div className="column">
+								<label>Opacity</label>
+								<input type="text" id="opacity"/>	
 							</div>
 						</div>
 					</div>
@@ -343,7 +486,6 @@ class Canvas extends React.Component {
 		Functions.drawOnMinusY(canvas.width/2, canvas.height/2, A.steps.y[1], A.drawnSteps.nbSteps.y[1], A.drawnSteps.stepSize.y[1], A.colors.dashColor, A.colors.wireColor, A.widths.dashWidth.y[1], A.widths.wireWidth[0], A.font.y[1], context);
 	}
 	componentDidMount(){
-		console.log("Mounting");
 		this.setState({canvas: this.refs.canvasW}, () => {
 			this.setState(() => {
 				let tempSteps = this.state.drawnSteps;
@@ -437,28 +579,20 @@ class ParamWrapper extends React.Component {
 	  this.state = {curves: curves};
 	}
 	newCurve = () => {
-		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
+		curves[0].push(new Curve2d([], [], "#FFFFFF", 3, [1, 0]));
 		animations.push(new Animation(0, 0, 1, 10, [[0, curves[0].length - 1]]));
 		this.setState({curves: curves});
 	};
 	newPCurve = () => {
-		curves[1].push(new Curve2d([], [], "#FFFFFF", 3));
+		curves[1].push(new Curve2d([], [], "#FFFFFF", 3, [1, 0]));
 		animations.push(new Animation(0, 0, 1, 10, [[1, curves[1].length - 1]]));
 		this.setState({curves: curves});
 	};
 	delete = (arg) => {
 		curves[arg[0]].splice(arg[1], 1);
-		let indice = [];
 		//Deleting curve from relevant animation
-		animations.forEach((el, ind) => {
-			el.curvInd = el.curvInd.filter((element, index) => {
-				if(element[0] == arg[0] && element[1] == arg[1]){
-					indice[0] = ind;
-					indice[1] = index;
-				};
-				return !(element[0] == arg[0] && element[1] == arg[1]);
-			});
-		});
+		let indice = findInd(arg);		
+		animations[indice[0]].curvInd.splice(indice[1]);
 		//Adjusting curve indices after deletion
 		animations.forEach((el, ind) => {
 			if(ind == indice[0]){
@@ -486,18 +620,17 @@ class ParamWrapper extends React.Component {
 						</div>
 						<div className="inputs">
 							{animations.map((el, ind) => {
-									if(el.curvInd.length == 1){
-										return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} delete={this.delete} showSett={this.props.showSett}/>; 																		
-									}
-									else{
-										return <span className="inputWrapper" key={ind}>
-												{el.curvInd.map((element, index) => {
-													return <WrCurve key={[element[0], element[1]].toString()} type={element[0]} cindex={element[1]} delete={this.delete} showSett={this.props.showSett}/>
-												})}
-												</span>;
-									}
+								if(el.curvInd.length == 1){
+									return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} delete={this.delete} showSett={this.props.showSett} currentSett={this.props.currentSett} settStatus={this.props.settStatus}/>; 																		
 								}
-							)}
+								else{
+									return <span className="inputWrapper" key={ind}>
+											{el.curvInd.map((element, index) => {
+												return <WrCurve key={[element[0], element[1]].toString()} type={element[0]} cindex={element[1]} delete={this.delete} showSett={this.props.showSett} currentSett={this.props.currentSett} settStatus={this.props.settStatus}/>
+											})}
+											</span>;
+								}
+							})}
 						</div><br/>
 					</div>
 					<div id="logo">
@@ -510,31 +643,25 @@ class ParamWrapper extends React.Component {
 class App extends React.Component {
 	constructor(props){
 		super(props);	
-		curves[0].push(new Curve2d([], [], "#FFFFFF", 3));
-		animations.push(new Animation(1, 0, 1, 10, [[0, 0]]));
-		this.state = {curves: curves, settStatus: false, currentSett: [0, 0]};
+		curves[0].push(new Curve2d([], [], "#FFFFFF", 3, [1, 0]));
+		animations.push(new Animation(0, 0, 1, 10, [[0, 0]]));
+		this.state = {curves: curves, settStatus: false, currentSett: []};
 	};
 	showSett = (curveInd) => {
 		this.setState({settStatus: true, currentSett: curveInd});
 	}
+	hideSett = () => {
+		this.setState({settStatus: false, currentSett: [[]]});	
+	}
 	render(){
-		if(this.state.settStatus){
-			return (<div id="main">
+		let sett = (this.state.settStatus) ? <Settings currentSett={this.state.currentSett} hide={this.hideSett}/> : null;
+		return (<div id="main">
 					<div id="core">
-						<Canvas settStatus={this.state.settStatus}/>
-						<Settings currentSett={this.state.currentSett}/>
-						<ParamWrapper showSett={this.showSett}/>
+						<Canvas/>
+						{sett}
+						<ParamWrapper showSett={this.showSett} currentSett={this.state.currentSett} settStatus={this.state.settStatus}/>
 					</div>
 				</div>);
-		}
-		else{
-			return (<div id="main">
-					<div id="core">
-						<Canvas settStatus={this.state.settStatus}/>
-						<ParamWrapper showSett={this.showSett}/>
-					</div>
-				</div>);
-		}
 	}
 }
 
