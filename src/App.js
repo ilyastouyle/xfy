@@ -1,14 +1,14 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faCog, faSave, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faCog, faSave, faAngleUp, faAngleDown, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
 import Functions from './Library';
 import Animations from './Animations';
 import { SketchPicker } from 'react-color';
 import './stylesheets/App.css';
 
-//Number of subdivisions of X (and thus Y) 
-let nbSubdiv = 100;
-let curves = [[], []], animations = []
+//Number of subdivisions of X (and thus Y) and Number of subdivisions for delimiters  
+let nbSubdiv = 500, nbSubdivDelim = 50;
+let curves = [[], []], animations = [], delimiters = [];
 //Global variables linked to canvas (for execution, pausing and stopping animation)
 let frameDuration = 0, totalDuration = 0, k = 0, mainLoop = 0, paused = false;
 
@@ -17,7 +17,7 @@ function findInd(cInd){
 	let indice = [];
 	animations.forEach((el, ind) => {
 		el.curvInd.forEach((element, index) => {
-			if(element[0] == cInd[0] && element[1] == cInd[1]){
+			if(element[0] === cInd[0] && element[1] === cInd[1]){
 				indice[0] = ind;
 				indice[1] = index;
 			};
@@ -29,21 +29,28 @@ function findInd(cInd){
 //delimiter width, index, place of delimiter between 0 & nbSubdiv, 
 //and number of subdivisions of the delimiter curve (the line), dashes, color
 function createDelim(width, cInd, x, nbS, dashes, color){
-	let y = eval(Functions.evaluateInput(curves[cInd[0]][cInd[1]].expression[0]));
+	let expression = Functions.evaluateInput(curves[cInd[0]][cInd[1]].expressions[0]);
+	let y =  (!isNaN(eval(expression))) ? eval(expression) : 0 ;
 	let delimiterX = Functions.subdivide(x, x, nbS);
 	let delimiterY = Functions.subdivide(0, y, nbS);
-	return (new Curve2d(delimiterX, delimiterY, color, width, dashes));
+	return ({
+				x: x,
+				width: width,
+				delimiterX: delimiterX,
+				delimiterY: delimiterY,
+				color: color,
+				dashes: dashes
+			});
 }
 class Curve2d{
-	constructor(X, Y, color, width, dashes) {
+	constructor(X, Y, color, width, dashes, delimiters) {
 		this.X = X;
 		this.Y = Y;
 		this.color = "#f3f1f3";
-		//DONT DELETE
-		this.borderColor = "#dbd9db";
 		this.width = width;
 		this.dashes = dashes;
-		this.expressions = [""];
+		this.expressions = [null, null, null, null];
+		this.delimiters=[];
 	}
 }
 class Animation{
@@ -70,9 +77,13 @@ class Animation{
 			//no animation
 			case 0:
 				executeBefore();
+				let delim = this.animCurves[0].delimiters;
 				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].dashes, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
 				//let delimitercreateDelim(2, this.curvInd[0], 0, 50, [1, 1], this.animCurves[0].color);
 				//Draw Delimiters
+				for(let i = 0; i < this.animCurves[0].delimiters.length; i++){
+					Functions.drawCurve(delim[i].width, delim[i].dashes, delim[i].delimiterX, delim[i].delimiterY, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, delim[i].color, context);	
+				}
 				//Functions.drawCurve(2, [1, 2], this.delimitersLX, this.delimitersLY, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
 				//Functions.drawCurve(2, [1, 2], this.delimitersRX, this.delimitersRY, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
 				break;
@@ -91,7 +102,6 @@ class ColorPicker extends React.Component{
 	state = {
 	    displayColorPicker: false,
 	    color: this.props.color,
-	    borderColor: this.props.borderColor
   	};
 
   	handleClick = () => {
@@ -104,54 +114,128 @@ class ColorPicker extends React.Component{
 
  	handleChange = (color) => {
  		let colorRgb = color.rgb;
- 		let borderColor = "rgb(" + (colorRgb.r * 0.5) + "," + (colorRgb.g * 0.5) + "," + (colorRgb.b * 0.5) + ")";
-    	this.setState({ color: color.hex, borderColor: borderColor }, () => this.props.update([color.hex, borderColor]))
+    	this.setState({ color: color.hex}, () => this.props.update(color.hex))
   	};
 
 	render() {
-
 		const styles = {
-	        button: {
-		        width: "30px",
-		        height: "30px",
-		        borderRadius: "50%",
-		        border: "2px solid",
-		        borderColor: this.state.borderColor,
-	        	backgroundColor: this.state.color
+	        view:{
+	        	backgroundColor: this.state.color,
 	        },
-	        popover: {
+	        popover:{
 	          	position: "absolute",
 	          	zIndex: "2",
 	          	marginTop: "1.5%",
-	          	right: '20%'
-	        },
-	        cover: {
-	          	position: "fixed",
-		        top: "0px",
-		        right: "0px",
-		        bottom: "0px",
-		        left: "0px"
+	          	borderRadius: "10px"
 	        }
 	    };
-
 	    return (
-	      		<div>
-	        		<button style={ styles.button } onClick={ this.handleClick } />
-	        		{ this.state.displayColorPicker ? <div style={ styles.popover }>
-	          			<div style={ styles.cover } onClick={ this.handleClose }/>
-	          			<SketchPicker color={ this.state.color } onChange={ this.handleChange } />
+	      		<span className="colorWrapper">
+		        	<span style={styles.wrapper}>
+		        		<input style={styles.view} onClick={this.handleClick} />
+		        		<button style={styles.button} onClick={this.handleClick}><FontAwesomeIcon style={styles.icon} icon={(this.state.displayColorPicker) ? faAngleUp : faAngleDown } /></button>
+	        		</span>
+	        		{ this.state.displayColorPicker ? <div style={styles.popover}>
+	          			<SketchPicker color={this.state.color} onChange={this.handleChange} />
 	        		</div> : null }
-	      		</div>
+	      		</span>
 	    		)
 	}
 }
-
+class Delimiter extends React.Component{
+	constructor(props) {
+	  	super(props);
+	
+		this.state = {
+			x: this.props.x,
+			width: this.props.width,
+			dashes: this.props.dashes,
+			color: this.props.color
+		};
+	}
+	handleDashInput = (e) => {
+		if(e.target.value == ""){
+			this.setState({dashes: ["a", this.state.dashes[1]]});
+		}
+		else{
+			if(!isNaN(e.target.value)){ 
+				this.setState({dashes: [parseInt(e.target.value), this.state.dashes[1]]});
+			}
+		}
+	}
+	handleSpacingInput = (e) => {
+		if(e.target.value == ""){
+			this.setState({dashes: [this.state.dashes[0], "a"]});
+		}
+		else{
+			if(!isNaN(e.target.value)){ 
+				this.setState({dashes: [this.state.dashes[0], parseInt(e.target.value)]});
+			}
+		}
+	}
+	handleXChange = (e) => {
+		if(e.target.value == ""){
+			this.setState({x: "a"});
+		}
+		else{
+			if(!isNaN(e.target.value) || e.target.value == "-" || e.target.value == ".") {
+				this.setState({x: (isNaN(e.target.value)) ? e.target.value : parseFloat(e.target.value)});
+			}
+		}
+	}
+	handleWChange = (e) => {
+		if(e.target.value == ""){
+			this.setState({width: "a"});
+		}
+		else{
+			if(!isNaN(e.target.value)) {
+				this.setState({width: parseInt(e.target.value)});
+			}
+		}
+	}
+	thickerW = () => {
+		this.setState({width: (this.state.width + 1)});
+	}
+	thinnerW = () => {
+		if(this.state.width > 1){ 
+			this.setState({width: (this.state.width - 1)});
+		}
+	}
+	handleColorChange = (color) => {
+		this.setState({color: color});
+	}
+	delete = () => {
+		this.props.delete(this.props.ind);
+	}
+	componentDidUpdate = () => {
+		this.props.update(this.props.ind, this.state);
+	}
+	render(){
+		return (<div className="delimWrapper">
+					<div className="inpWrapper xPosition">
+						<input className="xPosition" value={(this.state.x == "a") ? "" : this.state.x} onChange={this.handleXChange}/>
+					</div>
+					<div className="inpWrapper thickness">
+						<input className="width" value={(this.state.width == "a") ? "" : this.state.width} onChange={this.handleWChange} maxLength="3" />
+					</div>
+					<button className="thicker" onClick={this.thickerW}><b>+</b></button>
+					<button className="thinner" onClick={this.thinnerW}><b>-</b></button>
+					<div className="inpWrapper dashes">
+						<input className="dash" placeholder="1" value={(this.state.dashes[0] == "a") ? "" : this.state.dashes[0]} onChange={this.handleDashInput}/>
+					</div>
+					<div className="inpWrapper spacing">
+						<input className="spacing" placeholder="0" value={(this.state.dashes[1] == "a") ? "" : this.state.dashes[1]} onChange={this.handleSpacingInput}/>
+					</div>
+					<ColorPicker update={this.handleColorChange} color={this.state.color}/> 
+					<button className="delete" onClick={this.delete}><FontAwesomeIcon icon={faTimes} /></button>
+				</div>);
+	}
+}
 //Wrapper Curve: Template for Functional and Parameterized Curves
 class WrCurve extends React.Component{
 	constructor(props) {
 		super(props);
-
-		this.state = { cEdit: 0, tempF: [ null, null, null, null ] };
+		this.state = { cEdit: 0, modified: [false, false, false, false], error: false };
 		//animations.push(new Animation(0, 1, 1, [[this.props.type, this.props.cindex]]));
 	}
 	componentDidMount(){
@@ -159,47 +243,113 @@ class WrCurve extends React.Component{
 	}
 	componentDidUpdate(){
 		this.input.focus();
-		this.input.value = this.state.tempF[this.state.cEdit - 1];
+		this.input.value = curves[this.props.type][this.props.cindex].expressions[this.state.cEdit - 1];
 	}
 	previous = () => {
-		this.setState({ cEdit: (this.state.cEdit - 1) % 5, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)});
+		this.setState({ cEdit: (this.state.cEdit - 1) % 5});
 		this.input.value = "";
 	};
 	next = () => {
-		this.setState({ cEdit: (this.state.cEdit + 1) % 5, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)}, () => {
-			if(this.props.type === 0){
-				curves[this.props.type][this.props.cindex].expression = [this.state.tempF[0]];
-				if(!!this.state.tempF[1] && !!this.state.tempF[2]){
-					curves[this.props.type][this.props.cindex].X = Functions.subdivide(parseFloat(this.state.tempF[1]), parseFloat(this.state.tempF[2]), nbSubdiv);
-					for(let i = 0; i < curves[this.props.type][this.props.cindex].X.length; i++){
-						let x = (curves[this.props.type][this.props.cindex].X)[i];
-						curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(this.state.tempF[0]));
+		this.setState({modified: this.state.modified.map((el, ind) => {
+			if(ind == (this.state.cEdit - 1)) return true;
+		})});
+		try{
+			let expressions = curves[this.props.type][this.props.cindex].expressions;
+			let x = 0;
+			let test = parseFloat(eval(Functions.evaluateInput(this.input.value)));
+			if(!isNaN(test)){
+				this.setState({ cEdit: (this.state.cEdit + 1) % 5}, () => {
+					if(this.props.type === 0){
+						if(!!expressions[1] && !!expressions[2]){
+							curves[this.props.type][this.props.cindex].X = Functions.subdivide(parseFloat(expressions[1]), parseFloat(expressions[2]), nbSubdiv);
+							for(let i = 0; i < curves[this.props.type][this.props.cindex].X.length; i++){
+								let x = (curves[this.props.type][this.props.cindex].X)[i];
+								curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(expressions[0]));
+							}
+						}
 					}
-				}
+					else{
+						if(!!expressions[1] && !!expressions[2] && !!expressions[3]){
+							//Subdivided t parameter values tab
+							let tab1 = Functions.subdivide(parseFloat(expressions[2]), parseFloat(expressions[3]), nbSubdiv);
+							for(let i = 0; i < tab1.length; i++){
+								let t = tab1[i];
+								curves[this.props.type][this.props.cindex].X[i] = eval(Functions.evaluateInput(expressions[0]));
+								curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(expressions[1]));
+							}
+						}	
+					}
+				});
+				this.input.value = "";
+				this.setState({error: false});
 			}
 			else{
-				curves[this.props.type][this.props.cindex].expression = [this.state.tempF[0], this.state.tempF[1]];
-				if(!!this.state.tempF[1] && !!this.state.tempF[2] && !!this.state.tempF[3]){
-					//Subdivided t parameter values tab
-					let tab1 = Functions.subdivide(parseFloat(this.state.tempF[2]), parseFloat(this.state.tempF[3]), nbSubdiv);
-					for(let i = 0; i < tab1.length; i++){
-						let t = tab1[i];
-						curves[this.props.type][this.props.cindex].X[i] = eval(Functions.evaluateInput(this.state.tempF[0]));
-						curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(this.state.tempF[1]));
-					}
-				}	
+				this.setState({error: true});
 			}
-		});
-		this.input.value = "";
+		}
+		catch(error){
+			this.setState({error: true});
+		}
 	};
 	edit = () => {
-		this.setState({ cEdit: 1 });
+		this.setState({ cEdit: 1});
 	};	
 	save = () => {
-		this.setState({ cEdit: 0, tempF: this.state.tempF.map((v, i) => (i === this.state.cEdit - 1) ? this.input.value : v)}, () => {
-			animations.push(new Animation(0, 1, 1, [[this.props.type, this.props.cindex]]));
-		});
+		this.setState({modified: this.state.modified.map((el, ind) => {
+			if(ind == (this.state.cEdit - 1)) return true;
+		})});
+		try{
+			let expressions = curves[this.props.type][this.props.cindex].expressions;
+			let x = 0;
+			let test = parseFloat(eval(Functions.evaluateInput(this.input.value)));
+			if(!isNaN(test)){
+				if(this.props.type === 0){
+					if(!!expressions[1] && !!expressions[2]){
+						curves[this.props.type][this.props.cindex].X = Functions.subdivide(parseFloat(expressions[1]), parseFloat(expressions[2]), nbSubdiv);
+						for(let i = 0; i < curves[this.props.type][this.props.cindex].X.length; i++){
+							let x = (curves[this.props.type][this.props.cindex].X)[i];
+							curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(expressions[0]));
+						}
+					}
+				}
+				else{
+					if(!!expressions[1] && !!expressions[2] && !!expressions[3]){
+						//Subdivided t parameter values tab
+						let tab1 = Functions.subdivide(parseFloat(expressions[2]), parseFloat(expressions[3]), nbSubdiv);
+						for(let i = 0; i < tab1.length; i++){
+							let t = tab1[i];
+							curves[this.props.type][this.props.cindex].X[i] = eval(Functions.evaluateInput(expressions[0]));
+							curves[this.props.type][this.props.cindex].Y[i] = eval(Functions.evaluateInput(expressions[1]));
+						}
+					}	
+				}
+				this.input.value = "";
+				this.setState({cEdit: 0, error: false});
+			}
+			else{
+				this.setState({error: true});
+			}
+		}
+		catch(error){
+			this.setState({error: true});
+		}
 	};
+	handleInputChange = (event) => {
+		curves[this.props.type][this.props.cindex].expressions[this.state.cEdit - 1] = event.target.value;
+		let x = 0;
+		let test;
+		try{
+			test = parseFloat(eval(Functions.evaluateInput(event.target.value)));
+		}
+		catch(error){
+		}
+		if(isNaN(test) && event.target.value != "" && this.state.modified[this.state.cEdit - 1]){
+			this.setState({error: true});
+		}
+		else{
+			this.setState({error: false});
+		}
+	}
 	inputHandler = (e) => {
 		if(e.which === 13) this.next();
 	};
@@ -224,7 +374,7 @@ class WrCurve extends React.Component{
 						<label style={{display: (this.state.cEdit === 2) ? "inline" : "none"}}>&#92;({labels[1]}&#92;)</label>
 						<label style={{display: (this.state.cEdit === 3) ? "inline" : "none"}}>&#92;({labels[2]}&#92;)</label>
 						<label style={{display: (this.state.cEdit === 4) ? "inline" : "none"}}>&#92;({labels[3]}&#92;)</label>
-						<input className={inputClasses[this.state.cEdit]} type="text" ref={(input) => { this.input = input; }} onKeyUp={this.inputHandler} placeholder={placeholders[this.state.cEdit]} onChange={()=>{}}/>
+						<input className={inputClasses[this.state.cEdit] + " " + ((this.state.error) ? "error" : "")} type="text" ref={(input) => { this.input = input; }} onKeyUp={this.inputHandler} placeholder={placeholders[this.state.cEdit]} onChange={this.handleInputChange}/>
 						<button className="next" onClick={this.next} style={{display: (this.state.cEdit) ? "inline" : "none"}}><FontAwesomeIcon icon={faAngleRight} size="lg"/></button>
 						<button className="edit" onClick={this.edit} style={{display: (this.state.cEdit) ? "none" : "inline"}}><FontAwesomeIcon icon={faPencilAlt}/></button>
 					</div>
@@ -238,13 +388,13 @@ class Settings extends React.Component {
 	constructor(props){
 		super(props);
 		let ind = this.props.currentSett;
+		delimiters = curves[ind[0]][ind[1]].delimiters;
 		this.state = {
 			ind: ind,
 			thickness: curves[ind[0]][ind[1]].width,
 			dashes: curves[ind[0]][ind[1]].dashes,
-			delimiters: curves[ind[0]][ind[1]].dashes,
+			delimiters: delimiters,
 			color: curves[ind[0]][ind[1]].color,
-			borderColor: curves[ind[0]][ind[1]].borderColor,
 			anchor: animations[(findInd(ind))[0]].anchor,
 			duration: animations[(findInd(ind))[0]].duration,
 			animType: animations[(findInd(ind))[0]].type
@@ -255,13 +405,25 @@ class Settings extends React.Component {
 	}
 	save = () => {
 		let ind = this.state.ind;
+		delimiters = delimiters.map(el => createDelim(el.width, this.state.ind, el.x, nbSubdivDelim, el.dashes, el.color));
 		curves[ind[0]][ind[1]].width = this.state.thickness;
 		curves[ind[0]][ind[1]].color = this.state.color;
-		curves[ind[0]][ind[1]].borderColor = this.state.borderColor;
 		curves[ind[0]][ind[1]].dashes = this.state.dashes;
+		curves[ind[0]][ind[1]].delimiters = delimiters;
 		animations[findInd(ind)[0]].anchor = this.state.anchor;
 		animations[findInd(ind)[0]].duration = this.state.duration;
 		this.props.hide();
+	}
+	addDelimiter = () => {
+		delimiters.push({x: 0, width: 2, dashes: [1, 2], color: "#FFFFFF"});
+		this.setState({delimiters: delimiters});
+	}
+	updateDelim = (index, data) => {
+		delimiters[index] = data;
+	}
+	deleteDelim = (ind) => {
+		delimiters.splice(ind, 1);
+		this.setState({delimiters: delimiters});
 	}
 	//<SketchPicker color={(!!this.state.color.hex) ? this.state.color.hex : this.state.color} onChangeComplete={(color) => this.setState({color: color})}/>
 	//<ColorPicker color={this.state.curveColor} update={(color) => this.setState({curveColor: color})} />
@@ -279,82 +441,124 @@ class Settings extends React.Component {
 					</nav>
 					<div id="fsettings">
 						<div className="row">
-							<div className="column">
-								<label>Curve thickness: </label>
-								<input type="text" id="thickness" value={this.state.thickness} onChange={(e) => {if(!isNaN(e.target.value) && e.target.value != "") this.setState({thickness: parseInt(e.target.value)})}} maxLength="3" />
-								<button id="thicker" onClick={() => this.setState({thickness: (this.state.thickness+1)})}><b>+</b></button>
-								<button id="thinner" onClick={() => {if(this.state.thickness > 1) this.setState({thickness: (this.state.thickness-1)})}}><b>-</b></button>
+							<div className="subrow curve">
+								<label>Curve characteristics</label>
+								<div className="wrapper">
+									<div className="subwrapper">	
+										<label>Thickness</label>																																																																				
+										<input type="text" className="thickness" value={this.state.thickness} onChange={(e) => {if(!isNaN(e.target.value) && e.target.value != "") this.setState({thickness: parseInt(e.target.value)})}} maxLength="3" />
+										<button className="thicker" onClick={() => this.setState({thickness: (this.state.thickness+1)})}><b>+</b></button>
+										<button className="thinner" onClick={() => {if(this.state.thickness > 1) this.setState({thickness: (this.state.thickness-1)})}}><b>-</b></button>
+									</div>
+									<div className="subwrapper">	
+										<label>Dash:Spacing</label>
+										<input className="dash" placeholder="1" value={(this.state.dashes[0] == -1) ? "" : this.state.dashes[0]} onChange={(e) => {
+												if(e.target.value == ""){
+													this.setState({dashes: [-1, this.state.dashes[1]]});
+												}																																																						
+												else{
+													if(!isNaN(e.target.value)){ 
+														this.setState({dashes: [parseInt(e.target.value), this.state.dashes[1]]});
+													}
+												}
+											}}/>
+										<input className="spacing" placeholder="0" value={(this.state.dashes[1] == -1) ? "" : this.state.dashes[1]} onChange={(e) => {
+												if(e.target.value == ""){
+													this.setState({dashes: [this.state.dashes[0], -1]});
+												}
+												else{
+													if(!isNaN(e.target.value)){ 
+														this.setState({dashes: [this.state.dashes[0], parseInt(e.target.value)]});
+													}
+												}
+										}}/>
+									</div>
+									<div className="subwrapper">	
+										<label>Color</label>
+										<ColorPicker update={(color) => this.setState({color: color})} color={this.state.color}/>
+									</div>
+								</div>	
 							</div>
-							<div className="column">
-								<label>Divide into: </label>
-								<input type="text" id="divide" placeholder="20" maxLength="3" /><button id="divideb">Divide</button>
-							</div>
-						</div>
-						<div className="row">
-							<div className="column">
-								<label>Dash size &amp; spacing: </label>
-								<input id="dash" placeholder="1" value={(this.state.dashes[0] == -1) ? "" : this.state.dashes[0]} onChange={(e) => {
-										if(e.target.value == ""){
-											this.setState({dashes: [-1, this.state.dashes[1]]});
-										}
-										else{
-											if(!isNaN(e.target.value)){ 
-												this.setState({dashes: [parseInt(e.target.value), this.state.dashes[1]]});
-											}
-										}
-									}}/> :
-								<input id="spacing" placeholder="0" value={(this.state.dashes[1] == -1) ? "" : this.state.dashes[1]} onChange={(e) => {
-										if(e.target.value == ""){
-											this.setState({dashes: [this.state.dashes[0], -1]});
-										}
-										else{
-											if(!isNaN(e.target.value)){ 
-												this.setState({dashes: [this.state.dashes[0], parseInt(e.target.value)]});
-											}
-										}
-								}}/>
-							</div>
-							<div className="column">
-								<label>Color: </label>
-								<ColorPicker update={(color) => this.setState({color: color[0], borderColor: color[1]})} color={this.state.color} borderColor={this.state.borderColor}/>
-							</div>
-						</div>
-						<div className="row">
-							<div className="column">
-								<label>Starting time: </label>
-								<input type="text" id="anchor" value={this.state.anchor} onChange={(e) => this.setState({anchor: parseInt(e.target.value)})}/> seconds
-							</div>
-							<div className="column">
-								<label>Duration: </label>
-								<input type="text" id="duration" value={this.state.duration} onChange={(e) => this.setState({duration: parseInt(e.target.value)})}/> seconds
-							</div>
-						</div>
-						<div className="row">
-							<div className="column">
-								<label>Animation: </label>
-								<div className="container">
-									<button className={(this.state.animType == 0) ? "anim selected" : "anim"} id="noanim" onClick={() => this.setState({animType: 0})}>No animation</button>
-									<button className={(this.state.animType == 1) ? "anim selected" : "anim"} id="morph" onClick={() => this.setState({animType: 1})}>Morph</button>
-									<button className={(this.state.animType == 2) ? "anim selected" : "anim"} id="completeb">Complete</button>
-									<button className={(this.state.animType == 3) ? "anim selected" : "anim"} id="chase">Chase</button>
-									<button className={(this.state.animType == 4) ? "anim selected" : "anim"} id="rotate">Rotate</button>
-									<button className={(this.state.animType == 5) ? "anim selected" : "anim"} id="recompose">Recompose</button>
-									<button className={(this.state.animType == 6) ? "anim selected" : "anim"} id="mover">Scroll right</button>
-									<button className={(this.state.animType == 7) ? "anim selected" : "anim"} id="movel">Scroll left</button>
-									<button className={(this.state.animType == 8) ? "anim selected" : "anim"} id="moveu">Scroll up</button>
-									<button className={(this.state.animType == 9) ? "anim selected" : "anim"} id="moved">Scroll down</button>
+							<div className="subrow">
+								<div className="wrapper">
+									<div className="subwrapper">
+										<label>Divide into: </label>
+										<input type="text" id="divide" placeholder="20" maxLength="3" /><button id="divideb">Divide</button>
+									</div>
+									<div className="subwrapper">
+										<label>Opacity</label>
+										<input type="text" id="opacity"/>
+									</div>
 								</div>
 							</div>
 						</div>
 						<div className="row">
-							<div className="column">
-								<label>Delimiters</label>
-								<button>Left</button>
-								<button>Right</button>
+							<div className="subrow" >
+								<div className="wrapper">
+									<div className="subwrapper">
+										<label>Starting time: </label>
+										<input type="text" id="anchor" value={this.state.anchor} onChange={(e) => this.setState({anchor: parseInt(e.target.value)})}/> seconds
+									</div>
+									<div className="subwrapper">	
+										<label>Duration: </label>
+										<input type="text" id="duration" value={this.state.duration} onChange={(e) => this.setState({duration: parseInt(e.target.value)})}/> seconds
+									</div>
+								</div>
 							</div>
-							<div className="column">
-								<label>Opacity</label>
-								<input type="text" id="opacity"/>	
+							<div className="subrow">
+								<div className="wrapper">
+									<div className="subwrapper">
+										<button className={(this.state.animType == 0) ? "anim selected" : "anim"} id="noanim" onClick={() => this.setState({animType: 0})}>No animation</button>
+										<button className={(this.state.animType == 1) ? "anim selected" : "anim"} id="morph" onClick={() => this.setState({animType: 1})}>Morph</button>
+										<button className={(this.state.animType == 2) ? "anim selected" : "anim"} id="completeb">Complete</button>
+										<button className={(this.state.animType == 3) ? "anim selected" : "anim"} id="chase">Chase</button>
+										<button className={(this.state.animType == 4) ? "anim selected" : "anim"} id="rotate">Rotate</button>
+										<button className={(this.state.animType == 5) ? "anim selected" : "anim"} id="recompose">Recompose</button>
+										<button className={(this.state.animType == 6) ? "anim selected" : "anim"} id="mover">Scroll right</button>
+										<button className={(this.state.animType == 7) ? "anim selected" : "anim"} id="movel">Scroll left</button>
+										<button className={(this.state.animType == 8) ? "anim selected" : "anim"} id="moveu">Scroll up</button>
+										<button className={(this.state.animType == 9) ? "anim selected" : "anim"} id="moved">Scroll down</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className="row">
+							<div className="subrow">
+								<div className="wrapper">
+									<div className="subwrapper delimLabel">
+										<label>Delimiters</label>
+									</div>
+									<div className="subwrapper">
+										<button onClick={this.addDelimiter}>Add delimiter</button>
+										<button onClick={this.clearDelimiters}>Clear all</button>
+									</div>
+								</div><br/>
+								<div className="wrapper">
+									<div className="subwrapper delimTable">
+										<div className="labels">
+											<div className="delimColumn xPosition">
+												<label>x</label>
+											</div>
+											<div className="delimColumn thickness">
+												<label>width</label>
+											</div>
+											<div className="delimColumn dashes">
+												<label>dash:space</label>
+											</div>
+											<div className="delimColumn color">
+												<label>color</label>
+											</div>
+											<div className="delimColumn filler" />
+										</div>
+										<div>
+											{
+												this.state.delimiters.map((el, index) => {
+													return <Delimiter x={el.x} width={el.width} dashes={[el.dashes[0], el.dashes[1]]} color={el.color} key={el.x.toString() + index.toString()} ind={index} delete={this.deleteDelim} update={this.updateDelim}/>
+												})
+											}
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -497,7 +701,7 @@ class Canvas extends React.Component {
 			});
 		});
 	}
-	componentDidUpdate(){
+	componentDidUpdatedate(){
 	}
 	render(){
 		if(!this.state.canvas){
@@ -592,7 +796,7 @@ class ParamWrapper extends React.Component {
 		curves[arg[0]].splice(arg[1], 1);
 		//Deleting curve from relevant animation
 		let indice = findInd(arg);		
-		animations[indice[0]].curvInd.splice(indice[1]);
+		animations[indice[0]].curvInd.splice(indice[1], 1);
 		//Adjusting curve indices after deletion
 		animations.forEach((el, ind) => {
 			if(ind == indice[0]){

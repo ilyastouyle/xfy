@@ -35,15 +35,14 @@ body div#main div#core div#settWrapper {
   width: 30%;
   color: #f1a663;
   background-color: #c25725;
-  overflow: hidden;
   text-align: left;
   box-shadow: inset 5px -0.5px 5px 0px rgba(0, 0, 0, 0.6);
 }
-/* line 62, ../../sass/App.scss */
+/* line 61, ../../sass/App.scss */
 body div#main div#core div#settWrapper button::-moz-focus-inner {
   border: 0;
 }
-/* line 65, ../../sass/App.scss */
+/* line 64, ../../sass/App.scss */
 body div#main div#core div#settWrapper nav#centerControls {
   display: flex;
   width: 100%;
@@ -51,14 +50,14 @@ body div#main div#core div#settWrapper nav#centerControls {
   width: 100%;
   border-bottom: 6px dotted #ce723f;
 }
-/* line 71, ../../sass/App.scss */
+/* line 70, ../../sass/App.scss */
 body div#main div#core div#settWrapper nav#centerControls span {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 45%;
 }
-/* line 76, ../../sass/App.scss */
+/* line 75, ../../sass/App.scss */
 body div#main div#core div#settWrapper nav#centerControls span button {
   cursor: pointer;
   border: none;
@@ -69,113 +68,212 @@ body div#main div#core div#settWrapper nav#centerControls span button {
   background-color: #f1a663;
   color: #c25725;
 }
-/* line 89, ../../sass/App.scss */
+/* line 88, ../../sass/App.scss */
 body div#main div#core div#settWrapper nav#centerControls span.title {
   width: 60%;
 }
-/* line 92, ../../sass/App.scss */
+/* line 91, ../../sass/App.scss */
 body div#main div#core div#settWrapper nav#centerControls span.buttons {
   width: 30%;
 }
-/* line 100, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row.curvename {
-  display: flex;
-  width: 100%;
-}
-/* line 103, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row.curvename label {
-  color: #802c13;
-  display: inline-block;
-  margin: auto;
-}
-/* line 109, ../../sass/App.scss */
+/* line 99, ../../sass/App.scss */
 body div#main div#core div#settWrapper div#fsettings div.row {
   display: flex;
-  padding: 1%;
+  flex-direction: column;
   margin-left: auto;
   margin-right: auto;
-  width: 90%;
+  width: 100%;
+  height: 28vh;
+  padding-top: 1vh;
+  border-bottom: 4px dotted #ce723f;
 }
-/* line 115, ../../sass/App.scss */
+/* line 108, ../../sass/App.scss */
 body div#main div#core div#settWrapper div#fsettings div.row label {
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
-/* line 119, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column {
-  display: flexbox;
-  margin: 0 2%;
-  padding: 4%;
-  border-radius: 6px;
-  background-color: #ce723f;
+/* line 112, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow {
+  display: block;
+  width: 96%;
+  height: 96%;
+  padding: 2%;
 }
-/* line 132, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column input {
-  width: 50px;
-  padding: 6px;
-  padding-right: 0;
+/* line 117, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+}
+/* line 121, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper {
+  display: inline-block;
   margin: auto;
-  border-radius: 5px;
+  width: 96%;
+  text-align: center;
+  padding: 0% 2%;
+  border-right: 2px dotted #ce723f;
+}
+/* line 129, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper label {
+  margin: auto;
+  margin-bottom: 5px;
+}
+/* line 133, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper input {
+  width: 40px;
+  padding: 6px;
+  margin: auto;
   background-color: #f1a663;
   border: none;
   color: #c25725;
   text-align: center;
 }
-/* line 144, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column input#divide, body div#main div#core div#settWrapper div#fsettings div.row div.column input#thickness {
-  border-radius: 5px 0px 0px 5px;
-  margin-right: -2px;
-}
-/* line 149, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column input#spacing {
-  margin-left: 4px;
-}
-/* line 152, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column button {
+/* line 143, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper button {
   cursor: pointer;
   border: none;
   padding: 6px;
-  padding-right: 8px;
-  padding-left: 8px;
   margin: 0px;
   background-color: #f1a663;
   color: #c25725;
 }
-/* line 164, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column button.selected {
+/* line 157, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper button.selected {
   background-color: #450d08;
 }
-/* line 167, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column button#resetb {
-  border-radius: 3px 0px 0px 3px;
+/* line 161, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper:last-child, body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper.delimLabel {
+  border: none;
 }
-/* line 170, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column button#saveb {
-  border-radius: 0px 3px 3px 0px;
+/* line 165, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.subwrapper.delimLabel label {
+  margin: 0;
 }
-/* line 173, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column div.container {
+/* line 169, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels {
+  display: flex;
+  margin: auto;
+  margin-bottom: 2%;
+  width: 96%;
+}
+/* line 176, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.delimColumn {
+  display: inline-block;
+  width: 15%;
+  text-align: center;
+  border-right: 2px dotted #ce723f;
+  padding: 6px 0;
+}
+/* line 181, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.delimColumn label {
+  display: inline;
+  margin: auto;
+}
+/* line 187, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.delimColumn:last-child {
+  border: none;
+}
+/* line 190, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.xPosition {
+  width: 8%;
+  padding: 6px 2%;
+}
+/* line 194, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.thickness {
+  width: 32%;
+  padding: 6px 2%;
+}
+/* line 198, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.dashes {
+  width: 22%;
+  padding: 6px 1%;
+}
+/* line 202, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.color {
+  width: 16%;
+  padding: 6px 2%;
+}
+/* line 206, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.labels div.filler {
+  width: 8%;
+}
+/* line 210, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.container {
   display: inline-block;
   margin: auto;
   width: 98%;
   text-align: left;
 }
-/* line 181, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row div.column div.container button:not(:last-child) {
+/* line 218, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.container button:not(:last-child) {
   margin-right: 0px;
   margin-bottom: 4px;
 }
-/* line 189, ../../sass/App.scss */
-body div#main div#core div#settWrapper div#fsettings div.row:nth-child(3) div.column {
-  width: 92%;
+/* line 223, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper {
+  display: flex;
+  width: 96%;
+  margin: auto;
+  margin-bottom: 2%;
+  background-color: #f1a663;
 }
-/* line 195, ../../sass/App.scss */
+/* line 230, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper div.inpWrapper {
+  width: 12%;
+}
+/* line 232, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper div.inpWrapper input {
+  display: flexbox;
+  width: 96%;
+  padding: 6px 2%;
+}
+/* line 238, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper button {
+  display: flexbox;
+  width: 12%;
+}
+/* line 242, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper div.xPosition {
+  border-right: 2px dotted #ce723f;
+}
+/* line 245, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper button.thinner {
+  border-right: 2px dotted #ce723f;
+}
+/* line 248, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper div.spacing {
+  border-right: 2px dotted #ce723f;
+}
+/* line 251, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper button.delete {
+  width: 8%;
+}
+/* line 254, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper button.delete:hover {
+  background-color: #924426;
+}
+/* line 257, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper span.colorWrapper {
+  width: 20%;
+  border-right: 2px dotted #ce723f;
+}
+/* line 262, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper span.colorWrapper input {
+  padding: 6px 0;
+  width: 60%;
+}
+/* line 266, ../../sass/App.scss */
+body div#main div#core div#settWrapper div#fsettings div.row div.subrow div.wrapper div.delimWrapper span.colorWrapper button {
+  width: 40%;
+}
+/* line 280, ../../sass/App.scss */
 body div#main div#core div#paramWrapper {
   width: 20%;
   background-color: #133370;
   box-shadow: inset 5px -0.5px 5px 0px rgba(0, 0, 0, 0.6);
 }
-/* line 200, ../../sass/App.scss */
+/* line 285, ../../sass/App.scss */
 body div#main div#core div#paramWrapper nav#rightControls {
   display: flex;
   width: 100%;
@@ -184,14 +282,14 @@ body div#main div#core div#paramWrapper nav#rightControls {
   align-items: center;
   border-bottom: 6px dotted #3f5b8d;
 }
-/* line 207, ../../sass/App.scss */
+/* line 292, ../../sass/App.scss */
 body div#main div#core div#paramWrapper nav#rightControls span {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 45%;
 }
-/* line 212, ../../sass/App.scss */
+/* line 297, ../../sass/App.scss */
 body div#main div#core div#paramWrapper nav#rightControls span button {
   cursor: pointer;
   border: none;
@@ -202,24 +300,24 @@ body div#main div#core div#paramWrapper nav#rightControls span button {
   color: #133370;
   background-color: #8eb2b8;
 }
-/* line 225, ../../sass/App.scss */
+/* line 310, ../../sass/App.scss */
 body div#main div#core div#paramWrapper nav#rightControls span.title {
   width: 60%;
 }
-/* line 228, ../../sass/App.scss */
+/* line 313, ../../sass/App.scss */
 body div#main div#core div#paramWrapper nav#rightControls span.buttons {
   width: 30%;
 }
-/* line 232, ../../sass/App.scss */
+/* line 317, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#logo {
   height: 12%;
   opacity: .6;
 }
-/* line 235, ../../sass/App.scss */
+/* line 320, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#logo img {
   height: 100%;
 }
-/* line 239, ../../sass/App.scss */
+/* line 324, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters {
   height: 76%;
   overflow-y: hidden;
@@ -227,7 +325,7 @@ body div#main div#core div#paramWrapper div#parameters {
   flex-direction: row;
   box-shadow: inset 0px -4px 6px -1px rgba(0, 0, 0, 0.4);
 }
-/* line 247, ../../sass/App.scss */
+/* line 332, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters button {
   cursor: pointer;
   margin: 3px;
@@ -236,17 +334,17 @@ body div#main div#core div#paramWrapper div#parameters button {
   color: #133370;
   background-color: #8eb2b8;
 }
-/* line 257, ../../sass/App.scss */
+/* line 342, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters button::-moz-focus-inner {
   border: 0;
 }
-/* line 260, ../../sass/App.scss */
+/* line 345, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.buttons {
   padding: 3%;
   width: 94%;
   height: 10%;
 }
-/* line 265, ../../sass/App.scss */
+/* line 350, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs {
   height: 84%;
   width: 84%;
@@ -255,7 +353,7 @@ body div#main div#core div#paramWrapper div#parameters div.inputs {
   overflow: hidden;
   white-space: nowrap;
 }
-/* line 280, ../../sass/App.scss */
+/* line 365, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input {
   display: flex;
   flex-direction: row;
@@ -267,7 +365,7 @@ body div#main div#core div#paramWrapper div#parameters div.inputs span.input {
   color: #133370;
   background-color: #8eb2b8;
 }
-/* line 290, ../../sass/App.scss */
+/* line 375, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div {
   width: 85%;
   margin: auto;
@@ -275,13 +373,13 @@ body div#main div#core div#paramWrapper div#parameters div.inputs span.input div
   	border-left: 2px solid $color4; 
   }*/
 }
-/* line 293, ../../sass/App.scss */
+/* line 378, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div label {
   padding: 3px;
   padding-right: 8px;
   padding-left: 8px;
 }
-/* line 298, ../../sass/App.scss */
+/* line 383, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div input {
   width: 0px;
   background-color: transparent;
@@ -293,7 +391,7 @@ body div#main div#core div#paramWrapper div#parameters div.inputs span.input div
   text-align: center;
   display: none;
 }
-/* line 312, ../../sass/App.scss */
+/* line 397, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div input.jscolor {
   visibility: visible;
   width: 22px;
@@ -301,27 +399,27 @@ body div#main div#core div#paramWrapper div#parameters div.inputs span.input div
   border: 2px solid #133370;
   cursor: pointer;
 }
-/* line 319, ../../sass/App.scss */
+/* line 404, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div label.y {
   border-left: none;
 }
-/* line 322, ../../sass/App.scss */
+/* line 407, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div label.value {
   display: none;
 }
-/* line 328, ../../sass/App.scss */
+/* line 413, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div label.selec:not(.fx) {
   border-left: 0;
 }
-/* line 331, ../../sass/App.scss */
+/* line 416, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div label.xt, body div#main div#core div#paramWrapper div#parameters div.inputs span.input div label.yt {
   border-left: 0;
 }
-/* line 334, ../../sass/App.scss */
+/* line 419, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div label.yt {
   display: none;
 }
-/* line 337, ../../sass/App.scss */
+/* line 422, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div button {
   box-shadow: none;
   background-color: transparent;
@@ -332,25 +430,25 @@ body div#main div#core div#paramWrapper div#parameters div.inputs span.input div
   padding-right: 5px;
   margin: 2px;
 }
-/* line 347, ../../sass/App.scss */
+/* line 432, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div button {
   outline: none;
 }
-/* line 366, ../../sass/App.scss */
+/* line 451, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div.delete {
   width: 15%;
 }
-/* line 368, ../../sass/App.scss */
+/* line 453, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div.delete button {
   padding: 3px 6px;
   border-radius: 5px;
   background-color: #80a1a7;
 }
-/* line 373, ../../sass/App.scss */
+/* line 458, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.input div.delete button:hover {
   background-color: #556f9b;
 }
-/* line 378, ../../sass/App.scss */
+/* line 463, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.inputWrapper {
   display: flex;
   flex-direction: column;
@@ -360,24 +458,20 @@ body div#main div#core div#paramWrapper div#parameters div.inputs span.inputWrap
   border-radius: 4px;
   background-color: #3f5b8d;
 }
-/* line 386, ../../sass/App.scss */
+/* line 471, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs span.inputWrapper span.input {
   margin: 4px auto;
 }
-/* line 399, ../../sass/App.scss */
+/* line 484, ../../sass/App.scss */
 body div#main div#core div#paramWrapper div#parameters div.inputs input.selected.f, body div#main div#core div#paramWrapper div#parameters div.inputs input.selected.x, body div#main div#core div#paramWrapper div#parameters div.inputs input.selected.y, body div#main div#core div#paramWrapper div#parameters div.inputs input.selected.value {
   display: inline-block;
   width: 70px;
 }
-/* line 404, ../../sass/App.scss */
-body div#main div#core div#paramWrapper div#parameters div.inputs input.selected.jscolor {
-  width: 35px;
+/* line 489, ../../sass/App.scss */
+body div#main div#core div#paramWrapper div#parameters div.inputs input.selected.error {
+  border-bottom: 2px solid red;
 }
-/* line 407, ../../sass/App.scss */
-body div#main div#core div#paramWrapper div#parameters div.inputs input#function {
-  width: 200px;
-}
-/* line 413, ../../sass/App.scss */
+/* line 495, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper {
   position: absolute;
   z-index: 1;
@@ -385,7 +479,7 @@ body div#main div#core div#canvasWrapper {
   position: relative;
   background-color: #1e1828;
 }
-/* line 426, ../../sass/App.scss */
+/* line 508, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls {
   display: flex;
   width: 100%;
@@ -394,49 +488,49 @@ body div#main div#core div#canvasWrapper nav#leftControls {
   justify-content: center;
   border-bottom: 6px dotted #4b4553;
 }
-/* line 433, ../../sass/App.scss */
+/* line 515, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls span {
   width: 15%;
   display: inline-block;
   color: #c0bcc3;
 }
-/* line 437, ../../sass/App.scss */
+/* line 519, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls span h4 {
   display: inline-block;
   margin: 0px 10px;
 }
-/* line 441, ../../sass/App.scss */
+/* line 523, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls span h4.count {
   margin-right: 6px;
   width: 25px;
 }
-/* line 445, ../../sass/App.scss */
+/* line 527, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls span h4.seconds {
   margin-left: 0px;
 }
-/* line 449, ../../sass/App.scss */
+/* line 531, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls nav {
   display: flex;
   padding: 6px;
   margin: 4px;
   border-radius: 8px;
 }
-/* line 454, ../../sass/App.scss */
+/* line 536, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls nav button {
   cursor: pointer;
   background-color: transparent;
   color: #c0bcc3;
   border: none;
 }
-/* line 462, ../../sass/App.scss */
+/* line 544, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper nav#leftControls nav button::-moz-focus-inner {
   border: 0;
 }
-/* line 467, ../../sass/App.scss */
+/* line 549, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper div#canvas {
   height: 90%;
 }
-/* line 473, ../../sass/App.scss */
+/* line 555, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper div#canvas canvas#graph {
   position: absolute;
   height: inherit;
@@ -446,7 +540,7 @@ body div#main div#core div#canvasWrapper div#canvas canvas#graph {
   width: 100%;
   z-index: 1;
 }
-/* line 482, ../../sass/App.scss */
+/* line 564, ../../sass/App.scss */
 body div#main div#core div#canvasWrapper div#canvas canvas#toplayer {
   position: absolute;
   height: inherit;
@@ -456,7 +550,7 @@ body div#main div#core div#canvasWrapper div#canvas canvas#toplayer {
   width: 100%;
   z-index: 2;
 }
-/* line 495, ../../sass/App.scss */
+/* line 577, ../../sass/App.scss */
 body footer {
   display: inline-block;
   width: 100%;
@@ -469,7 +563,7 @@ body footer {
   padding-left: 5% px;
   color: #ccd2db;
 }
-/* line 506, ../../sass/App.scss */
+/* line 588, ../../sass/App.scss */
 body footer a {
   color: #ccd2db;
   text-decoration: none;
