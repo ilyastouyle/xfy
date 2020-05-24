@@ -29,8 +29,8 @@ function findInd(cInd){
 //delimiter width, index, place of delimiter between 0 & nbSubdiv, 
 //and number of subdivisions of the delimiter curve (the line), dashes, color
 function createDelim(width, cInd, x, nbS, dashes, color){
-	let expression = Functions.evaluateInput(curves[cInd[0]][cInd[1]].expressions[0]);
-	let y =  (!isNaN(eval(expression))) ? eval(expression) : 0 ;
+	let expression = (curves[cInd[0]][cInd[1]].expressions[0] != null) ? Functions.evaluateInput(curves[cInd[0]][cInd[1]].expressions[0]) : 0;
+	let y = (!isNaN(eval(expression))) ? eval(expression) : 0 ;
 	let delimiterX = Functions.subdivide(x, x, nbS);
 	let delimiterY = Functions.subdivide(0, y, nbS);
 	return ({
@@ -116,7 +116,6 @@ class ColorPicker extends React.Component{
  		let colorRgb = color.rgb;
     	this.setState({ color: color.hex}, () => this.props.update(color.hex))
   	};
-
 	render() {
 		const styles = {
 	        view:{
@@ -159,7 +158,7 @@ class Delimiter extends React.Component{
 		}
 		else{
 			if(!isNaN(e.target.value)){ 
-				this.setState({dashes: [parseInt(e.target.value), this.state.dashes[1]]});
+				this.setState({dashes: [e.target.value, this.state.dashes[1]]});
 			}
 		}
 	}
@@ -169,18 +168,20 @@ class Delimiter extends React.Component{
 		}
 		else{
 			if(!isNaN(e.target.value)){ 
-				this.setState({dashes: [this.state.dashes[0], parseInt(e.target.value)]});
+				this.setState({dashes: [this.state.dashes[0], e.target.value]});
 			}
 		}
 	}
 	handleXChange = (e) => {
-		if(e.target.value == ""){
-			this.setState({x: "a"});
+		this.setState({x: e.target.value});
+	}
+	handleXKeyPress = (e) => {
+		if(isNaN(e.key) && e.key != '.' && e.key != '-'){
+			e.preventDefault();
 		}
 		else{
-			if(!isNaN(e.target.value) || e.target.value == "-" || e.target.value == ".") {
-				this.setState({x: (isNaN(e.target.value)) ? e.target.value : parseFloat(e.target.value)});
-			}
+			if(e.key == "." && this.state.x.includes('.')) e.preventDefault();
+			if(e.key == "-" && this.state.x.length >= 1) e.preventDefault();
 		}
 	}
 	handleWChange = (e) => {
@@ -189,7 +190,7 @@ class Delimiter extends React.Component{
 		}
 		else{
 			if(!isNaN(e.target.value)) {
-				this.setState({width: parseInt(e.target.value)});
+				this.setState({width: e.target.value});
 			}
 		}
 	}
@@ -208,12 +209,17 @@ class Delimiter extends React.Component{
 		this.props.delete(this.props.ind);
 	}
 	componentDidUpdate = () => {
-		this.props.update(this.props.ind, this.state);
+		if(!isNaN(parseFloat(this.state.x))){
+			//console.log(tempState.x);
+			let tempState = Object.create(this.state);
+			tempState.x = parseFloat(tempState.x);
+			this.props.update(this.props.ind, tempState);
+		}
 	}
 	render(){
 		return (<div className="delimWrapper">
 					<div className="inpWrapper xPosition">
-						<input className="xPosition" value={(this.state.x == "a") ? "" : this.state.x} onChange={this.handleXChange}/>
+						<input className="xPosition" value={(this.state.x == "a") ? "" : this.state.x} onChange={this.handleXChange} onKeyPress={this.handleXKeyPress}/>
 					</div>
 					<div className="inpWrapper thickness">
 						<input className="width" value={(this.state.width == "a") ? "" : this.state.width} onChange={this.handleWChange} maxLength="3" />
@@ -251,11 +257,18 @@ class WrCurve extends React.Component{
 	};
 	next = () => {
 		this.setState({modified: this.state.modified.map((el, ind) => {
-			if(ind == (this.state.cEdit - 1)) return true;
+			return ((ind == (this.state.cEdit - 1)) ? true : el);
 		})});
 		try{
 			let expressions = curves[this.props.type][this.props.cindex].expressions;
-			let x = 0;
+			let x = null;
+			let t = null;
+			if(this.props.type == 0){
+				x = 0;			
+			}
+			else{
+				t = 0;
+			}
 			let test = parseFloat(eval(Functions.evaluateInput(this.input.value)));
 			if(!isNaN(test)){
 				this.setState({ cEdit: (this.state.cEdit + 1) % 5}, () => {
@@ -296,11 +309,18 @@ class WrCurve extends React.Component{
 	};	
 	save = () => {
 		this.setState({modified: this.state.modified.map((el, ind) => {
-			if(ind == (this.state.cEdit - 1)) return true;
+			return ((ind == (this.state.cEdit - 1)) ? true : el);
 		})});
 		try{
 			let expressions = curves[this.props.type][this.props.cindex].expressions;
-			let x = 0;
+			let x = null;
+			let t = null;
+			if(this.props.type == 0){
+				x = 0;			
+			}
+			else{
+				t = 0;
+			}
 			let test = parseFloat(eval(Functions.evaluateInput(this.input.value)));
 			if(!isNaN(test)){
 				if(this.props.type === 0){
@@ -336,7 +356,14 @@ class WrCurve extends React.Component{
 	};
 	handleInputChange = (event) => {
 		curves[this.props.type][this.props.cindex].expressions[this.state.cEdit - 1] = event.target.value;
-		let x = 0;
+		let x = null;
+		let t = null;
+		if(this.props.type == 0){
+			x = 0;			
+		}
+		else{
+			t = 0;
+		}
 		let test;
 		try{
 			test = parseFloat(eval(Functions.evaluateInput(event.target.value)));
@@ -397,7 +424,8 @@ class Settings extends React.Component {
 			color: curves[ind[0]][ind[1]].color,
 			anchor: animations[(findInd(ind))[0]].anchor,
 			duration: animations[(findInd(ind))[0]].duration,
-			animType: animations[(findInd(ind))[0]].type
+			animType: animations[(findInd(ind))[0]].type,
+			error: false
 		};
 	}
 	componentDidMount(){
@@ -424,6 +452,9 @@ class Settings extends React.Component {
 	deleteDelim = (ind) => {
 		delimiters.splice(ind, 1);
 		this.setState({delimiters: delimiters});
+	}
+	handleError = (error) => {
+		this.setState({error: error})
 	}
 	//<SketchPicker color={(!!this.state.color.hex) ? this.state.color.hex : this.state.color} onChangeComplete={(color) => this.setState({color: color})}/>
 	//<ColorPicker color={this.state.curveColor} update={(color) => this.setState({curveColor: color})} />
@@ -553,7 +584,7 @@ class Settings extends React.Component {
 										<div>
 											{
 												this.state.delimiters.map((el, index) => {
-													return <Delimiter x={el.x} width={el.width} dashes={[el.dashes[0], el.dashes[1]]} color={el.color} key={el.x.toString() + index.toString()} ind={index} delete={this.deleteDelim} update={this.updateDelim}/>
+													return <Delimiter x={el.x} width={el.width} dashes={[el.dashes[0], el.dashes[1]]} color={el.color} key={el.x.toString() + index.toString()} ind={index} delete={this.deleteDelim} update={this.updateDelim} handleError={this.handleError}/>
 												})
 											}
 										</div>
