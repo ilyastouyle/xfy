@@ -99,13 +99,29 @@ class Animation {
 };
 
 class ColorPicker extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.selector = React.createRef();
+	}
 	state = {
 		displayColorPicker: false,
 		color: this.props.color,
 	};
 
 	handleClick = () => {
-		this.setState({ displayColorPicker: !this.state.displayColorPicker })
+		this.setState({ displayColorPicker: !this.state.displayColorPicker }, () => {
+			if(this.state.displayColorPicker){
+				let yPosition = this.selector.current.getBoundingClientRect().y;
+				let windowHeight = window.document.body.offsetHeight;
+				let selectorHeight = this.selector.current.offsetHeight;
+				if(yPosition + selectorHeight >= windowHeight){
+					this.selector.current.style.bottom = (windowHeight - yPosition + 40) + "px"
+				}
+				//console.log();
+				//if(this.state.displayColorPicker) this.selector.current.style.border = "6px solid black";}
+			}
+		});
 	};
 
 	handleClose = () => {
@@ -124,8 +140,9 @@ class ColorPicker extends React.Component {
 			popover: {
 				position: "absolute",
 				zIndex: "2",
-				marginTop: "1.5%",
-				borderRadius: "10px"
+				marginTop: "5px",
+				marginLeft: "5px",
+				borderRadius: "10px",
 			}
 		};
 		return (
@@ -134,7 +151,7 @@ class ColorPicker extends React.Component {
 					<input style={styles.view} onClick={this.handleClick} />
 					<button style={styles.button} onClick={this.handleClick}><FontAwesomeIcon style={styles.icon} icon={(this.state.displayColorPicker) ? faAngleUp : faAngleDown} /></button>
 				</span>
-				{this.state.displayColorPicker ? <div style={styles.popover}>
+				{this.state.displayColorPicker ? <div ref={this.selector} style={styles.popover}>
 					<SketchPicker color={this.state.color} onChange={this.handleChange} />
 				</div> : null}
 			</span>
@@ -153,20 +170,20 @@ class Delimiter extends React.Component {
 		};
 	}
 	handleDashInput = (e) => {
-		if (e.target.value == "") {
+		if(e.target.value == "") {
 			this.setState({ dashes: ["a", this.state.dashes[1]] });
 		}
-		else {
+		else{
 			if (!isNaN(e.target.value)) {
 				this.setState({ dashes: [parseInt(e.target.value), this.state.dashes[1]] });
 			}
 		}
 	}
 	handleSpacingInput = (e) => {
-		if (e.target.value == "") {
+		if(e.target.value == "") {
 			this.setState({ dashes: [this.state.dashes[0], "a"] });
 		}
-		else {
+		else{
 			if (!isNaN(e.target.value)) {
 				this.setState({ dashes: [this.state.dashes[0], parseInt(e.target.value)] });
 			}
@@ -176,10 +193,10 @@ class Delimiter extends React.Component {
 		this.setState({ x: e.target.value });
 	}
 	handleXKeyPress = (e) => {
-		if (isNaN(e.key) && e.key != '.' && e.key != '-') {
+		if(isNaN(e.key) && e.key != '.' && e.key != '-') {
 			e.preventDefault();
 		}
-		else {
+		else{
 			if (e.key == "." && this.state.x.includes('.')) e.preventDefault();
 			if (e.key == "-" && this.state.x.length >= 1) e.preventDefault();
 		}
