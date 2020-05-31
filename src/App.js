@@ -53,6 +53,35 @@ class Curve2d {
 		this.delimiters = [];
 	}
 }
+class ThicknessInput extends React.Component{
+	constructor(props){
+		super(props);
+
+		this.state = { thickness: this.props.thickness };
+	}
+	handleThickChange = (e) => {
+		if (!isNaN(e.target.value) && e.target.value != "") {
+			this.setState({ thickness: parseInt(e.target.value) }, () => {
+				this.props.update(this.state.thickness)
+			}); 
+		}
+	}
+	increaseThickness = () => this.setState({ thickness: (this.state.thickness + 1) }, () => {
+		this.props.update(this.state.thickness);
+	});
+	decreaseThickness = () => { 
+		if (this.state.thickness > 1) this.setState({ thickness: (this.state.thickness - 1) }, () => {
+			this.props.update(this.state.thickness);
+		}); 
+	}
+	render(){
+		return (<div className="thicknessInput">
+					<input type="text" className="thickness" value={this.state.thickness} onChange={this.handleThickChange} maxLength="3" />
+					<button className="thicker" onClick={this.increaseThickness}><b>+</b></button>
+					<button className="thinner" onClick={this.decreaseThickness}><b>-</b></button>
+				</div>);
+	}
+}
 class Animation {
 	/* 
 		type: type of animation (Integer) 
@@ -137,21 +166,15 @@ class ColorPicker extends React.Component {
 			view: {
 				backgroundColor: this.state.color,
 			},
-			popover: {
-				position: "absolute",
-				zIndex: "2",
-				marginTop: "5px",
-				marginLeft: "5px",
-				borderRadius: "10px",
-			}
 		};
 		return (
 			<span className="colorWrapper">
-				<span style={styles.wrapper}>
+				<span>
 					<input style={styles.view} onClick={this.handleClick} />
 					<button style={styles.button} onClick={this.handleClick}><FontAwesomeIcon style={styles.icon} icon={(this.state.displayColorPicker) ? faAngleUp : faAngleDown} /></button>
 				</span>
-				{this.state.displayColorPicker ? <div ref={this.selector} style={styles.popover}>
+				{this.state.displayColorPicker ? <div ref={this.selector} className="popover">
+					<button className="saveColor" onClick={this.handleClick}> Save </button>
 					<SketchPicker color={this.state.color} onChange={this.handleChange} />
 				</div> : null}
 			</span>
@@ -201,23 +224,8 @@ class Delimiter extends React.Component {
 			if (e.key == "-" && this.state.x.length >= 1) e.preventDefault();
 		}
 	}
-	handleWChange = (e) => {
-		if (e.target.value == "") {
-			this.setState({ width: "a" });
-		}
-		else {
-			if (!isNaN(e.target.value)) {
-				this.setState({ width: e.target.value });
-			}
-		}
-	}
-	thickerW = () => {
-		this.setState({ width: (this.state.width + 1) });
-	}
-	thinnerW = () => {
-		if (this.state.width > 1) {
-			this.setState({ width: (this.state.width - 1) });
-		}
+	handleWChange = (width) => {
+		this.setState({width: width});
 	}
 	handleColorChange = (color) => {
 		this.setState({ color: color });
@@ -228,7 +236,6 @@ class Delimiter extends React.Component {
 	componentDidUpdate = () => {
 		if (!isNaN(parseFloat(this.state.x))) {
 			let tempState = Object.create(this.state);
-			console.log(parseFloat(tempState.x));
 			tempState.x = parseFloat(tempState.x);
 			this.props.update(this.props.ind, tempState);
 		}
@@ -238,11 +245,7 @@ class Delimiter extends React.Component {
 			<div className="inpWrapper xPosition">
 				<input className="xPosition" value={(this.state.x == "a") ? "" : this.state.x} onChange={this.handleXChange} onKeyPress={this.handleXKeyPress} />
 			</div>
-			<div className="inpWrapper thickness">
-				<input className="width" value={(this.state.width == "a") ? "" : this.state.width} onChange={this.handleWChange} maxLength="3" />
-			</div>
-			<button className="thicker" onClick={this.thickerW}><b>+</b></button>
-			<button className="thinner" onClick={this.thinnerW}><b>-</b></button>
+			<ThicknessInput thickness={this.state.width} update={this.handleWChange}/>				
 			<div className="inpWrapper dashes">
 				<input className="dash" placeholder="1" value={(this.state.dashes[0] == "a") ? "" : this.state.dashes[0]} onChange={this.handleDashInput} />
 			</div>
@@ -468,8 +471,13 @@ class Settings extends React.Component {
 		animations[findInd(ind)[0]].duration = this.state.duration;
 		this.props.hide();
 	}
+	updateThickness = (thickness) => this.setState({thickness: thickness});
 	addDelimiter = () => {
 		delimiters.push({ x: 0, width: 2, dashes: [1, 2], color: "#FFFFFF" });
+		this.setState({ delimiters: delimiters });
+	}
+	clearDelimiters = () => {
+		delimiters = [];
 		this.setState({ delimiters: delimiters });
 	}
 	updateDelim = (index, data) => {
@@ -480,7 +488,7 @@ class Settings extends React.Component {
 		this.setState({ delimiters: delimiters });
 	}
 	handleError = (error) => {
-		this.setState({ error: error })
+		this.setState({ error: error });
 	}
 	//<SketchPicker color={(!!this.state.color.hex) ? this.state.color.hex : this.state.color} onChangeComplete={(color) => this.setState({color: color})}/>
 	//<ColorPicker color={this.state.curveColor} update={(color) => this.setState({curveColor: color})} />
@@ -499,13 +507,10 @@ class Settings extends React.Component {
 			<div id="fsettings">
 				<div className="row">
 					<div className="subrow curve">
-						<label>Curve characteristics</label>
 						<div className="wrapper">
 							<div className="subwrapper">
 								<label>Thickness</label>
-								<input type="text" className="thickness" value={this.state.thickness} onChange={(e) => { if (!isNaN(e.target.value) && e.target.value != "") this.setState({ thickness: parseInt(e.target.value) }) }} maxLength="3" />
-								<button className="thicker" onClick={() => this.setState({ thickness: (this.state.thickness + 1) })}><b>+</b></button>
-								<button className="thinner" onClick={() => { if (this.state.thickness > 1) this.setState({ thickness: (this.state.thickness - 1) }) }}><b>-</b></button>
+								<ThicknessInput thickness={this.state.thickness} update={this.updateThickness} />
 							</div>
 							<div className="subwrapper">
 								<label>Dash:Spacing</label>
@@ -542,9 +547,46 @@ class Settings extends React.Component {
 								<label>Divide into: </label>
 								<input type="text" id="divide" placeholder="20" maxLength="3" /><button id="divideb">Divide</button>
 							</div>
-							<div className="subwrapper">
-								<label>Opacity</label>
-								<input type="text" id="opacity" />
+						</div>
+					</div>
+				</div>
+				<div className="row delimiters">
+					<div className="subrow topDelim">
+						<div className="wrapper">
+							<div className="subwrapper delimLabel">
+								<label>Delimiters</label>
+							</div>
+							<div className="subwrapper buttons">
+								<button onClick={this.addDelimiter}>Add delimiter</button>
+								<button onClick={this.clearDelimiters}>Clear all</button>
+							</div>
+						</div><br/>
+					</div>
+					<div className="subrow">
+						<div className="wrapper">
+							<div className="subwrapper delimTable">
+								<div className="labels">
+									<div className="delimColumn xPosition">
+										<label>x</label>
+									</div>
+									<div className="delimColumn thickness">
+										<label>width</label>
+									</div>
+									<div className="delimColumn dashes">
+										<label>dash:space</label>
+									</div>
+									<div className="delimColumn color">
+										<label>color</label>
+									</div>
+									<div className="delimColumn filler" />
+								</div>
+								<div className="delimList">
+									{
+										this.state.delimiters.map((el, index) => {
+											return <Delimiter x={el.x} width={el.width} dashes={[el.dashes[0], el.dashes[1]]} color={el.color} key={el.x.toString() + index.toString()} ind={index} delete={this.deleteDelim} update={this.updateDelim} handleError={this.handleError} />
+										})
+									}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -575,45 +617,6 @@ class Settings extends React.Component {
 								<button className={(this.state.animType == 7) ? "anim selected" : "anim"} id="movel">Scroll left</button>
 								<button className={(this.state.animType == 8) ? "anim selected" : "anim"} id="moveu">Scroll up</button>
 								<button className={(this.state.animType == 9) ? "anim selected" : "anim"} id="moved">Scroll down</button>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div className="row">
-					<div className="subrow">
-						<div className="wrapper">
-							<div className="subwrapper delimLabel">
-								<label>Delimiters</label>
-							</div>
-							<div className="subwrapper">
-								<button onClick={this.addDelimiter}>Add delimiter</button>
-								<button onClick={this.clearDelimiters}>Clear all</button>
-							</div>
-						</div><br />
-						<div className="wrapper">
-							<div className="subwrapper delimTable">
-								<div className="labels">
-									<div className="delimColumn xPosition">
-										<label>x</label>
-									</div>
-									<div className="delimColumn thickness">
-										<label>width</label>
-									</div>
-									<div className="delimColumn dashes">
-										<label>dash:space</label>
-									</div>
-									<div className="delimColumn color">
-										<label>color</label>
-									</div>
-									<div className="delimColumn filler" />
-								</div>
-								<div>
-									{
-										this.state.delimiters.map((el, index) => {
-											return <Delimiter x={el.x} width={el.width} dashes={[el.dashes[0], el.dashes[1]]} color={el.color} key={el.x.toString() + index.toString()} ind={index} delete={this.deleteDelim} update={this.updateDelim} handleError={this.handleError} />
-										})
-									}
-								</div>
 							</div>
 						</div>
 					</div>
