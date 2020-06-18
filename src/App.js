@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faCog, faSave, faAngleUp, faAngleDown, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faCog, faClone, faSave, faCheck, faAngleUp, faAngleDown, faAngleLeft, faAngleRight, faPencilAlt, faSearchPlus, faSearchMinus, faArrowLeft, faArrowRight, faArrowUp, faArrowDown, faPlus, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
 import Functions from './Library';
 import Animations from './Animations';
 import { SketchPicker } from 'react-color';
@@ -24,6 +24,24 @@ function findInd(cInd) {
 		});
 	});
 	return indice;
+}
+function cloneCurveInto(curve, newCurve) {
+	curve.X.forEach((el, ind) => newCurve.X[ind] = el);
+	curve.Y.forEach((el, ind) => newCurve.Y[ind] = el);
+	newCurve.color = curve.color;
+	newCurve.width = curve.width;
+	curve.dashes.forEach((el, ind) => newCurve.dashes[ind] = el);
+	curve.expressions.forEach((el, ind) => newCurve.expressions[ind] = el);
+	newCurve.delimiters = new Array(curve.delimiters.length);
+	curve.delimiters.forEach((el, ind) => {
+		let tempDelim = {};
+		tempDelim.x = el.x;
+		tempDelim.width = el.width;
+		tempDelim.color = el.color;
+		tempDelim.dashes = new Array(el.dashes.length);
+		el.dashes.forEach((elem, ind_dash) => tempDelim.dashes[ind_dash] = elem);
+		newCurve.delimiters[ind] = tempDelim;
+	});
 }
 //Function for computing and return delimiters, takes in :
 //delimiter width, index, place of delimiter between 0 & nbSubdiv, 
@@ -51,6 +69,50 @@ class Curve2d {
 		this.dashes = dashes;
 		this.expressions = [null, null, null, null];
 		this.delimiters = [];
+	}
+}
+class FloatInput extends React.Component{
+	constructor(props){
+		super(props);
+
+		this.state = { input : this.props.value, error: false };
+	}
+	handleChange = (e) => {
+		this.setState({ input: e.target.value }, () => {
+			try{
+				let n = 0;
+				let test = eval(this.state.input);
+				this.setState({ error: (isNaN(test) && this.state.input != "") }, () => {
+					this.props.update(this.state);
+				});				
+			}	
+			catch(error){
+				this.setState({ error: true }, () => {
+					this.props.update(this.state);
+				})
+			}
+		}, () => {
+			//console.log(this.state.error);
+		});
+	}
+	handleKeyPress = (e) => {
+		if(isNaN(e.key) && e.key != '.' && e.key != '-' && e.key != '*' && e.key != '/' && e.key != '(' && e.key != ')'){
+			if(!!this.props.exceptionKeys){
+				if(!this.props.exceptionKeys.includes(e.key)){
+					e.preventDefault();
+				}
+			}
+			else{
+				e.preventDefault();
+			}
+		} 	
+		else{
+			if (e.key == '.' && this.state.input[this.state.input.length - 1] == '.') e.preventDefault();
+			if (e.key == '-' && this.state.input.length >= 1) e.preventDefault();
+		}
+	}
+	render(){
+		return (<input className={"floatInput" + ((this.state.error) ? "error" : "")} placeholder={this.props.placeholder} value={this.state.input} onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>);
 	}
 }
 class ThicknessInput extends React.Component{
@@ -186,10 +248,13 @@ class Delimiter extends React.Component {
 		super(props);
 
 		this.state = {
-			x: this.props.x,
+			x: {input: this.props.x, error: false},
 			width: this.props.width,
 			dashes: this.props.dashes,
-			color: this.props.color
+			color: this.props.color,
+			displayParameter: false,
+			paramA: {input: this.props.paramA, error: false},
+			paramB: {input: this.props.paramB, error: false}
 		};
 	}
 	handleDashInput = (e) => {
@@ -212,20 +277,11 @@ class Delimiter extends React.Component {
 			}
 		}
 	}
-	handleXChange = (e) => {
-		this.setState({ x: e.target.value });
-	}
-	handleXKeyPress = (e) => {
-		if(isNaN(e.key) && e.key != '.' && e.key != '-') {
-			e.preventDefault();
-		}
-		else{
-			if (e.key == "." && this.state.x.includes('.')) e.preventDefault();
-			if (e.key == "-" && this.state.x.length >= 1) e.preventDefault();
-		}
+	updateX = (data) => {
+		this.setState({ x: data });
 	}
 	handleWChange = (width) => {
-		this.setState({width: width});
+		this.setState({ width: width});
 	}
 	handleColorChange = (color) => {
 		this.setState({ color: color });
@@ -233,28 +289,79 @@ class Delimiter extends React.Component {
 	delete = () => {
 		this.props.delete(this.props.ind);
 	}
+	toggleParameter = () => {
+		this.setState({ displayParameter: !this.state.displayParameter });
+	}
+	updateParamA = (data) => {
+		this.setState({ paramA: data });
+	}
+	updateParamB = (data) => {
+		this.setState({ paramB: data });
+	}
+	componentDidMount = () => {
+		window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, "delimWrapper"]);
+	}
 	componentDidUpdate = () => {
-		if (!isNaN(parseFloat(this.state.x))) {
-			let tempState = Object.create(this.state);
-			tempState.x = parseFloat(tempState.x);
-			this.props.update(this.props.ind, tempState);
+		if(!this.state.x.error){
+			if(this.state.paramA.input != "" && this.state.paramB.input != ""){
+				if(!this.state.paramA.error && !this.state.paramB.error){
+					let tempState = {};
+					tempState.x = this.state.x.input;
+					tempState.width = this.state.width;
+					tempState.color = this.state.color;
+					tempState.dashes = new Array(2);
+					this.state.dashes.forEach((el, ind) => tempState.dashes[ind] = el);
+					tempState.paramA = this.state.paramA.input;
+					tempState.paramB = this.state.paramB.input;
+					this.props.update(this.props.ind, tempState);
+				}
+			}
+			else{
+				let tempState = {};
+				tempState.x = this.state.x.input;
+				tempState.width = this.state.width;
+				tempState.color = this.state.color;
+				tempState.dashes = new Array(2);
+				this.state.dashes.forEach((el, ind) => tempState.dashes[ind] = el);
+				tempState.paramA = this.state.paramA.input;
+				tempState.paramB = this.state.paramB.input;
+				this.props.update(this.props.ind, tempState);
+			}
 		}
 	}
 	render() {
 		return (<div className="delimWrapper">
-			<div className="inpWrapper xPosition">
-				<input className="xPosition" value={(this.state.x == "a") ? "" : this.state.x} onChange={this.handleXChange} onKeyPress={this.handleXKeyPress} />
-			</div>
-			<ThicknessInput thickness={this.state.width} update={this.handleWChange}/>				
-			<div className="inpWrapper dashes">
-				<input className="dash" placeholder="1" value={(this.state.dashes[0] == "a") ? "" : this.state.dashes[0]} onChange={this.handleDashInput} />
-			</div>
-			<div className="inpWrapper spacing">
-				<input className="spacing" placeholder="0" value={(this.state.dashes[1] == "a") ? "" : this.state.dashes[1]} onChange={this.handleSpacingInput} />
-			</div>
-			<ColorPicker update={this.handleColorChange} color={this.state.color} />
-			<button className="delete" onClick={this.delete}><FontAwesomeIcon icon={faTimes} /></button>
-		</div>);
+					<div className="main">
+						<div className="inpWrapper xPosition">
+							<FloatInput value={this.state.x.input} update={this.updateX} exceptionKeys={["n"]}/>
+						</div>
+						<ThicknessInput thickness={this.state.width} update={this.handleWChange}/>				
+						<div className="inpWrapper dashes">
+							<input className="dash" placeholder="1" value={(this.state.dashes[0] == "a") ? "" : this.state.dashes[0]} onChange={this.handleDashInput} />
+						</div>
+						<div className="inpWrapper spacing">
+							<input className="spacing" placeholder="0" value={(this.state.dashes[1] == "a") ? "" : this.state.dashes[1]} onChange={this.handleSpacingInput} />
+						</div>
+						<ColorPicker update={this.handleColorChange} color={this.state.color} />
+						<button className="delete" onClick={this.delete}><FontAwesomeIcon icon={faTimes} /></button>
+					</div>
+					<div className="parameter" style={{ display: (this.state.x.input.toString().includes('n')) ? "inline-block" : "none" }}>
+						<div className="wrapper">
+							<div className="panel" style={{display: (this.state.displayParameter) ? "inline-block" : "none"}}>
+								<label>&#92;( n \in \hspace{"6px"} [ &#92;)</label>
+								<FloatInput placeholder="a" value={this.state.paramA.input} update={this.updateParamA}/>
+								<label>&#92;( , &#92;)</label>
+								<FloatInput placeholder="b" value={this.state.paramB.input} update={this.updateParamB}/>
+								<label>&#92;( ] \hspace{"6px"} \cap \hspace{"6px"} \mathbb&#123;Z&#125; &#92;)</label>
+								<button className="check" onClick={this.toggleParameter}><i><FontAwesomeIcon icon={faCheck} size="xs"/></i></button>
+							</div>
+							{ 	(!this.state.displayParameter) ?
+								<button className={(this.state.displayParameter) ? "toggleParameter dropped" : "toggleParameter"} onClick={this.toggleParameter}><i><FontAwesomeIcon icon={(this.state.displayParameter) ? faAngleUp : faAngleDown} size="xs"/></i></button>
+								: null
+							}
+						</div>
+					</div>
+				</div>);
 	}
 }
 //Wrapper Curve: Template for Functional and Parameterized Curves
@@ -331,6 +438,7 @@ class WrCurve extends React.Component {
 	edit = () => {
 		this.setState({ cEdit: 1 });
 	};
+	clone = () => this.props.clone([this.props.type, this.props.cindex]);
 	save = () => {
 		this.setState({
 			modified: this.state.modified.map((el, ind) => {
@@ -425,6 +533,7 @@ class WrCurve extends React.Component {
 		return (<span className="input" style={{ opacity: (selected) ? 0.4 : 1, pointerEvents: (selected) ? "none" : "auto" }}>
 			<div>
 				<button className="openS" onClick={() => { if (!this.props.settStatus) this.props.showSett([this.props.type, this.props.cindex]) }} style={{ display: (this.state.cEdit) ? "none" : "inline" }}><FontAwesomeIcon icon={faCog} /></button>
+				<button className="duplicate" onClick={this.clone} style={{ display: (this.state.cEdit) ? "none" : "inline" }}><FontAwesomeIcon icon={faClone} /></button>
 				<button className="save" onClick={this.save} style={{ display: (this.state.cEdit) ? "inline" : "none" }}><FontAwesomeIcon icon={faSave} /></button>
 				<button className="previous" onClick={this.previous} style={{ display: (this.state.cEdit > 1) ? "inline" : "none" }}><FontAwesomeIcon icon={faAngleLeft} size="lg" /></button>
 				<label style={{ display: (this.state.cEdit < 2) ? "inline" : "none" }}>&#92;({labels[0]}&#92;)</label>
@@ -462,18 +571,18 @@ class Settings extends React.Component {
 		window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, "settWrapper"]);
 	}
 	save = () => {
-		let ind = this.state.ind;
-		curves[ind[0]][ind[1]].width = this.state.thickness;
-		curves[ind[0]][ind[1]].color = this.state.color;
-		curves[ind[0]][ind[1]].dashes = this.state.dashes;
-		curves[ind[0]][ind[1]].delimiters = delimiters;
-		animations[findInd(ind)[0]].anchor = this.state.anchor;
-		animations[findInd(ind)[0]].duration = this.state.duration;
+		let index = this.state.ind;
+		curves[index[0]][index[1]].width = this.state.thickness;
+		curves[index[0]][index[1]].color = this.state.color;
+		this.state.dashes.forEach((el, ind) => curves[index[0]][index[1]].dashes[ind] = el);
+		delimiters.forEach((el, ind) => curves[index[0]][index[1]].delimiters[ind] = el);
+		animations[findInd(index)[0]].anchor = this.state.anchor;
+		animations[findInd(index)[0]].duration = this.state.duration;
 		this.props.hide();
 	}
 	updateThickness = (thickness) => this.setState({thickness: thickness});
 	addDelimiter = () => {
-		delimiters.push({ x: 0, width: 2, dashes: [1, 2], color: "#FFFFFF" });
+		delimiters.push({ x: 0, width: 2, dashes: [1, 2], color: "#FFFFFF", paramA: "", paramB: "" });
 		this.setState({ delimiters: delimiters });
 	}
 	clearDelimiters = () => {
@@ -583,7 +692,10 @@ class Settings extends React.Component {
 								<div className="delimList">
 									{
 										this.state.delimiters.map((el, index) => {
-											return <Delimiter x={el.x} width={el.width} dashes={[el.dashes[0], el.dashes[1]]} color={el.color} key={el.x.toString() + index.toString()} ind={index} delete={this.deleteDelim} update={this.updateDelim} handleError={this.handleError} />
+											return <Delimiter x={el.x} width={el.width} dashes={[el.dashes[0], el.dashes[1]]} color={el.color} key={el.x.toString() + index.toString()} ind={index} delete={this.deleteDelim} update={this.updateDelim} handleError={this.handleError} 
+												paramA={el.paramA}
+												paramB={el.paramB}
+											/>
 										})
 									}
 								</div>
@@ -840,18 +952,25 @@ class ParamWrapper extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = { curves: curves };
+		this.state = { curves: curves, animations: animations };
 	}
 	newCurve = () => {
 		curves[0].push(new Curve2d([], [], "#FFFFFF", 3, [1, 0]));
 		animations.push(new Animation(0, 0, 1, 10, [[0, curves[0].length - 1]]));
-		this.setState({ curves: curves });
+		this.setState({ curves: curves, animations});
 	};
 	newPCurve = () => {
 		curves[1].push(new Curve2d([], [], "#FFFFFF", 3, [1, 0]));
 		animations.push(new Animation(0, 0, 1, 10, [[1, curves[1].length - 1]]));
-		this.setState({ curves: curves });
+		this.setState({ curves: curves, animations });
 	};
+	clone = ([type, index]) => {
+		let clone = new Curve2d([], [], "", 0, [0, 0]);
+		cloneCurveInto(curves[type][index], clone);
+		curves[type].push(clone);
+		animations.push(new Animation(0, 0, 1, 10, [[type, curves[type].length - 1]]));
+		this.setState({ curves: curves, animations });
+	}
 	delete = (arg) => {
 		curves[arg[0]].splice(arg[1], 1);
 		//Deleting curve from relevant animation
@@ -885,12 +1004,12 @@ class ParamWrapper extends React.Component {
 				<div className="inputs">
 					{animations.map((el, ind) => {
 						if (el.curvInd.length == 1) {
-							return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} delete={this.delete} showSett={this.props.showSett} currentSett={this.props.currentSett} settStatus={this.props.settStatus} />;
+							return <WrCurve key={[el.curvInd[0][0], el.curvInd[0][1]].toString()} type={el.curvInd[0][0]} cindex={el.curvInd[0][1]} clone={this.clone} delete={this.delete} showSett={this.props.showSett} currentSett={this.props.currentSett} settStatus={this.props.settStatus} />;
 						}
 						else {
 							return <span className="inputWrapper" key={ind}>
 								{el.curvInd.map((element, index) => {
-									return <WrCurve key={[element[0], element[1]].toString()} type={element[0]} cindex={element[1]} delete={this.delete} showSett={this.props.showSett} currentSett={this.props.currentSett} settStatus={this.props.settStatus} />
+									return <WrCurve key={[element[0], element[1]].toString()} type={element[0]} cindex={element[1]} clone={this.clone} delete={this.delete} showSett={this.props.showSett} currentSett={this.props.currentSett} settStatus={this.props.settStatus} />
 								})}
 							</span>;
 						}

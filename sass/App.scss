@@ -21,6 +21,7 @@ $color20: #450d08; //selected animation button color
 $color21: #ce723f; //settings section color
 $color22: #80a1a7; //delete span.input button color
 $color23: #556f9b; //delete span.input button hover color
+$color24: #9a451d; //delimiter border color
 
 body{	
 	padding: 0;
@@ -198,76 +199,142 @@ body{
 									}
 								}
 								div.delimWrapper{
-									display: flex;
+									display: inline-block;
 									width: 96%;
 									margin: auto;
-									//padding: 2%;
-									margin-bottom: 2%;
-									background-color: $color13;
-									div.inpWrapper{
-										width: 12%;
-										input{
-											display: flexbox;
-											width: 96%;
-											padding: 6px 2%;
-										}
-										input::-webkit-outer-spin-button,
-										input::-webkit-inner-spin-button {
-										  -webkit-appearance: none;
-										  margin: 0;
-										}
-
-										/* Firefox */
-										input[type=number] {
-										  -moz-appearance: textfield;
-										}
-									}
-									button{
-										display: flexbox;
-										width: 12%;
-									}
-									div.xPosition{
-										border-right: 2px dotted $color21; 
-									}
-									div.thicknessInput{
-										border-right: 2px dotted $color21;
-										width: 36%;
+									margin-bottom: 5px;
+									div.main{
 										display: flex;
-										input{
-											width: 40%;
+										width: 100%;
+										margin: 0 auto;
+										//padding: 2%;
+										background-color: $color13;
+										div.inpWrapper{
+											width: 12%;
+											input{
+												display: flexbox;
+												width: 96%;
+												padding: 6px 2%;
+											}
+											input::-webkit-outer-spin-button,
+											input::-webkit-inner-spin-button {
+											  -webkit-appearance: none;
+											  margin: 0;
+											}
+
+											/* Firefox */
+											input[type=number] {
+											  -moz-appearance: textfield;
+											}
 										}
 										button{
-											width: 30%;
+											display: flexbox;
+											width: 12%;
+										}
+										div.xPosition{
+											border-right: 2px dotted $color21; 
+										}
+										div.thicknessInput{
+											border-right: 2px dotted $color21;
+											width: 36%;
+											display: flex;
+											input{
+												width: 40%;
+											}
+											button{
+												width: 30%;
+											}
+										}
+										div.spacing{
+											border-right: 2px dotted $color21;
+										}
+										button.delete{
+											width: 8%;
+										}
+										button.delete:hover{
+											background-color: #924426;
+										}
+										span.colorWrapper{
+											//width: 20%;
+											//display: inline;
+											width: 20%;
+											border-right: 2px dotted $color21;
+											input{
+												padding: 6px 0;
+												width: 60%;
+											}
+											button{
+												width: 40%;
+											}
+											button.saveColor{
+												width: auto;
+												border-top-right-radius: 5px;
+												padding-right: 10px;
+												background-color: transparent;
+											}
+											//background-color: green;
 										}
 									}
-									div.spacing{
-										border-right: 2px dotted $color21;
-									}
-									button.delete{
-										width: 8%;
-									}
-									button.delete:hover{
-										background-color: #924426;
-									}
-									span.colorWrapper{
-										//width: 20%;
-										//display: inline;
-										width: 20%;
-										border-right: 2px dotted $color21;
-										input{
-											padding: 6px 0;
-											width: 60%;
+									div.parameter{
+										display: inline-block;
+										width: 100%;
+										//height: 10px;
+										//margin-bottom: 5px;
+										div.wrapper{
+											display: inline-block;
+											width: 100%;
+											div{
+												width: 100%;
+												padding: 4px 0;
+												margin-bottom: 0;
+												border-top: 2px dotted $color11;
+												border-bottom-right-radius: 3px;
+												border-bottom-left-radius: 3px;
+												background-color: $color13;
+												color: $color11;
+												label{
+													display: inline;
+												}
+												input{
+													width: 20px;
+													margin: 0 4px;
+													padding-bottom: 3px;
+												}
+												button.check{
+													//float: right;
+													margin-left: 15%;
+													border-radius: 5px;
+													border: 2px solid $color11;
+													//height: 20px;
+													padding: 1px 4px;
+												}
+											}
+											button.toggleParameter{
+												display: inline-block;
+												width: 12%;
+												height: 10px;
+												margin: 0 auto;
+												padding: 0;
+												//padding-bottom: 5px;
+												border-bottom-right-radius: 6px;
+												border-bottom-left-radius: 6px;
+												border: 3px solid $color24;
+												border-top: 2px dotted $color11;
+												text-align: center;
+												overflow: hidden;
+												color: $color13;
+											}
+											button.toggleParameter.dropped{
+												background-color: $color13;
+												color: $color11;
+												height: 18px;
+											}
+											button.toggleParameter:hover{
+												background-color: $color13;
+												color: $color11;
+												height: 18px;
+											}
 										}
-										button{
-											width: 40%;
-										}
-										button.saveColor{
-											width: auto;
-											border-top-right-radius: 5px;
-											padding-right: 10px;
-											background-color: transparent;
-										}
-										//background-color: green;
 									}
 								}	
 							}
