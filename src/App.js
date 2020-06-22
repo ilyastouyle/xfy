@@ -168,11 +168,21 @@ class Animation {
 			//no animation
 			case 0:
 				executeBefore();
-				let delim = this.animCurves[0].delimiters.map(el => createDelim(el.width, this.curvInd[0], el.x, nbSubdivDelim, el.dashes, el.color));
+				let delim = [];
+				this.animCurves[0].delimiters.forEach(el => {
+					if(el.paramA == ""){
+						delim.push(createDelim(el.width, this.curvInd[0], parseFloat(el.x), nbSubdivDelim, el.dashes, el.color));
+					}
+					else{
+						for(let n = parseInt(el.paramA); n <= parseInt(el.paramB); n++){
+						delim.push(createDelim(el.width, this.curvInd[0], eval(el.x), nbSubdivDelim, el.dashes, el.color));
+						}
+					}
+				});
 				Functions.drawCurve(this.animCurves[0].width, this.animCurves[0].dashes, this.animCurves[0].X, this.animCurves[0].Y, steps, thestep, canvasDim[0] / 2, canvasDim[1] / 2, this.animCurves[0].color, context);
 				//let delimitercreateDelim(2, this.curvInd[0], 0, 50, [1, 1], this.animCurves[0].color);
 				//Draw Delimiters
-				for (let i = 0; i < this.animCurves[0].delimiters.length; i++) {
+				for (let i = 0; i < delim.length; i++) {
 					Functions.drawCurve(delim[i].width, delim[i].dashes, delim[i].delimiterX, delim[i].delimiterY, steps, thestep, canvasDim[0] / 2, canvasDim[1] / 2, delim[i].color, context);
 				}
 				//Functions.drawCurve(2, [1, 2], this.delimitersLX, this.delimitersLY, steps, thestep, canvasDim[0]/2, canvasDim[1]/2, this.animCurves[0].color, context);
@@ -302,29 +312,29 @@ class Delimiter extends React.Component {
 		window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, "delimWrapper"]);
 	}
 	componentDidUpdate = () => {
-		if(!this.state.x.error){
+		if(!this.state.x.error && this.state.x.input != ""){
 			if(this.state.paramA.input != "" && this.state.paramB.input != ""){
 				if(!this.state.paramA.error && !this.state.paramB.error){
 					let tempState = {};
-					tempState.x = this.state.x.input;
+					tempState.x = this.state.x.input.trim();
 					tempState.width = this.state.width;
 					tempState.color = this.state.color;
 					tempState.dashes = new Array(2);
 					this.state.dashes.forEach((el, ind) => tempState.dashes[ind] = el);
-					tempState.paramA = this.state.paramA.input;
-					tempState.paramB = this.state.paramB.input;
+					tempState.paramA = (this.state.x.input.toString().includes('n')) ? this.state.paramA.input.trim() : "";
+					tempState.paramB = (this.state.x.input.toString().includes('n')) ? this.state.paramB.input.trim() : "";
 					this.props.update(this.props.ind, tempState);
 				}
 			}
 			else{
 				let tempState = {};
-				tempState.x = this.state.x.input;
+				tempState.x = this.state.x.input.trim();
 				tempState.width = this.state.width;
 				tempState.color = this.state.color;
 				tempState.dashes = new Array(2);
 				this.state.dashes.forEach((el, ind) => tempState.dashes[ind] = el);
-				tempState.paramA = this.state.paramA.input;
-				tempState.paramB = this.state.paramB.input;
+				tempState.paramA = (this.state.x.input.toString().includes('n')) ? this.state.paramA.input.trim() : "";
+				tempState.paramB = (this.state.x.input.toString().includes('n')) ? this.state.paramB.input.trim() : "";
 				this.props.update(this.props.ind, tempState);
 			}
 		}
