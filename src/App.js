@@ -40,6 +40,8 @@ function cloneCurveInto(curve, newCurve) {
 		tempDelim.color = el.color;
 		tempDelim.dashes = new Array(el.dashes.length);
 		el.dashes.forEach((elem, ind_dash) => tempDelim.dashes[ind_dash] = elem);
+		tempDelim.paramA = el.paramA;
+		tempDelim.paramB = el.paramB;
 		newCurve.delimiters[ind] = tempDelim;
 	});
 }
@@ -175,7 +177,7 @@ class Animation {
 					}
 					else{
 						for(let n = parseInt(el.paramA); n <= parseInt(el.paramB); n++){
-						delim.push(createDelim(el.width, this.curvInd[0], eval(el.x), nbSubdivDelim, el.dashes, el.color));
+							delim.push(createDelim(el.width, this.curvInd[0], eval(el.x), nbSubdivDelim, el.dashes, el.color));
 						}
 					}
 				});
