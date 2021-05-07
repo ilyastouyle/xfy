@@ -139,22 +139,24 @@ class ThicknessInput extends React.Component{
 		}); 
 	}
 	render(){
-		return (<div className="thicknessInput">
+		return (
+				<div className="thicknessInput">
 					<input type="text" className="thickness" value={this.state.thickness} onChange={this.handleThickChange} maxLength="3" />
 					<button className="thicker" onClick={this.increaseThickness}><b>+</b></button>
 					<button className="thinner" onClick={this.decreaseThickness}><b>-</b></button>
-				</div>);
+				</div>
+		);
 	}
 }
 class Animation {
-	/* 
+	/*
 		type: type of animation (Integer) 
 		anchor: starting point in time (Float)
 		duration: duration of animation in seconds (Float)
 		fps: frames per second (Integer)
 		curvInd: the curves involved in the animation ([[0 or 1, index],[...],...])
 	*/
-	constructor(type, anchor, duration, fps, curvInd) {
+	constructor(type, anchor, duration, fps, curvInd){
 		this.type = type;
 		this.curvInd = curvInd;
 		this.animCurves = [];
@@ -199,7 +201,7 @@ class Animation {
 				break;
 		}
 	}
-};
+}
 
 class ColorPicker extends React.Component {
 	constructor(props) {
@@ -247,7 +249,7 @@ class ColorPicker extends React.Component {
 					<input style={styles.view} onClick={this.handleClick} />
 					<button style={styles.button} onClick={this.handleClick}><FontAwesomeIcon style={styles.icon} icon={(this.state.displayColorPicker) ? faAngleUp : faAngleDown} /></button>
 				</span>
-				{this.state.displayColorPicker ? <div ref={this.selector} className="popover">
+				{thqis.state.displayColorPicker ? <div ref={this.selector} className="popover">
 					<button className="saveColor" onClick={this.handleClick}> Save </button>
 					<SketchPicker color={this.state.color} onChange={this.handleChange} />
 				</div> : null}
